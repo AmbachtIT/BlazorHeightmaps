@@ -3,7 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorHeightmaps.Wasm.App", "src\BlazorHeightmaps.Wasm.App\BlazorHeightmaps.Wasm.App.csproj", "{3F6CBBFF-9D77-4E2A-BAF6-BCDF0A764F85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorHeightmaps.Wasm.App", "src\BlazorHeightmaps.Wasm.App\BlazorHeightmaps.Wasm.App.csproj", "{3F6CBBFF-9D77-4E2A-BAF6-BCDF0A764F85}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A7D8F562-789D-4635-84E7-10EE94B5F89A}"
+	ProjectSection(SolutionItems) = preProject
+		dev-tools.ps1 = dev-tools.ps1
+		LICENSE = LICENSE
+		post-build.ps1 = post-build.ps1
+		README.md = README.md
+		tailwind.config.js = tailwind.config.js
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
