@@ -396,3 +396,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/src/BlazorHeightmaps.Wasm.App/wwwroot/css/app.css

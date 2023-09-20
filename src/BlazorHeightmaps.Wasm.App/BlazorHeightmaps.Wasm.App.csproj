@@ -11,4 +11,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.9" PrivateAssets="all" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="cd $(SolutionDir)&#xD;&#xA;powershell -NoProfile -ExecutionPolicy RemoteSigned -file &quot;post-build.ps1&quot;" />
+  </Target>
+
 </Project>
