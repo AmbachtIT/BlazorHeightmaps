@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,7 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Components\" />
+    <ProjectReference Include="..\Ambacht.Common.Blazor\Ambacht.Common.Blazor.csproj" />
+    <ProjectReference Include="..\Ambacht.Common.Maps\Ambacht.Common.Maps.csproj" />
+    <ProjectReference Include="..\Ambacht.Common\Ambacht.Common.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

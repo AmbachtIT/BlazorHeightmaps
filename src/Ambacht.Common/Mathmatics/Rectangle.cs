@@ -144,7 +144,10 @@ namespace Ambacht.Common.Mathmatics
             yield return new Vector2(Left, Bottom);
         }
 
-        public Rectangle Translate(Vector2 v) => new(Left + v.X, Top + v.Y, Width, Height);
+        public Vector2 TopLeft() => new(Left, Top);
+        public Vector2 BottomRight() => new(Right, Bottom);
+
+		public Rectangle Translate(Vector2 v) => new(Left + v.X, Top + v.Y, Width, Height);
 
         #region Dragging
 

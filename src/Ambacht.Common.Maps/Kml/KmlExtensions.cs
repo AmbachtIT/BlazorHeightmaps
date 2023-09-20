@@ -12,7 +12,7 @@ namespace Ambacht.Common.Maps.Kml
     public static class KmlExtensions {
 
 		/*
-		public static IEnumerable<IEnumerable<LatLng>> GetCoords(this KmlType kml) {
+		public static IEnumerable<IEnumerable<Coords>> GetCoords(this KmlType kml) {
 			return kml.GetPlacemarks().SelectMany(p => GetCoordinates(p));
 		}
 		*/
@@ -28,7 +28,7 @@ namespace Ambacht.Common.Maps.Kml
 			}
 		}
 
-		private static IEnumerable<IEnumerable<LatLng>> GetCoordinates(PlacemarkType placemark) {
+		private static IEnumerable<IEnumerable<Coords>> GetCoordinates(PlacemarkType placemark) {
 		if(placemark.Geometries != null) {
 				foreach(var polygon in GetCoordinates(placemark.Geometries.OfType<PolygonType>())) {
 					yield return polygon;
@@ -36,14 +36,14 @@ namespace Ambacht.Common.Maps.Kml
 			} 
 		}
 
-		private static IEnumerable<IEnumerable<LatLng>> GetCoordinates(IEnumerable<PolygonType> polygons) {
+		private static IEnumerable<IEnumerable<Coords>> GetCoordinates(IEnumerable<PolygonType> polygons) {
 			foreach(var polygon in polygons) {
 				yield return GetCoordinates(polygon);
 			}
 		}
 
 	
-		public static IEnumerable<LatLng> GetCoordinates(this PolygonType polygon) {
+		public static IEnumerable<Coords> GetCoordinates(this PolygonType polygon) {
 			return GetCoordinates(polygon.outerBoundaryIs.LinearRing.coordinates);
 		}*/
 

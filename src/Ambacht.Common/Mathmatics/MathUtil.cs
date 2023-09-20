@@ -199,9 +199,17 @@ namespace Ambacht.Common.Mathmatics
             return (value - from) / delta;
         }
 
+        /// <summary>
+        /// Reverse linear interpolation
+        /// </summary>
+        public static Vector2 ReverseLerp(Vector2 from, Vector2 to, Vector2 value) => new(
+	        ReverseLerp(from.X, to.X, value.X),
+	        ReverseLerp(from.Y, to.Y, value.Y)
+        );
 
 
-        public static float AngleLerpDegrees(float from, float to, float alpha)
+
+		public static float AngleLerpDegrees(float from, float to, float alpha)
         {
             var delta = from - to;
             if (delta < -180)
