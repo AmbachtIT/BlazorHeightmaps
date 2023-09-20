@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cd $(SolutionDir)&#xD;&#xA;powershell -NoProfile -ExecutionPolicy RemoteSigned -file &quot;post-build.ps1&quot;" />
+    <Exec Command="cd ..\..&#xD;&#xA;powershell -NoProfile -ExecutionPolicy RemoteSigned -file &quot;post-build.ps1&quot;" />
   </Target>
 
 </Project>
