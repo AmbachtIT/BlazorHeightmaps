@@ -3,39 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MudBlazor;
 
 namespace Ambacht.Common.Blazor.Services
 {
     internal class ToastService : IToastService
     {
+	    public void Success(string title, string message)
+	    {
+		    throw new NotImplementedException();
+	    }
 
-        public ToastService(ISnackbar snackbar)
-        {
-            _snackbar = snackbar;
-        }
+	    public void Info(string title, string message)
+	    {
+		    throw new NotImplementedException();
+	    }
 
-        private readonly ISnackbar _snackbar;
+	    public void Warning(string title, string message)
+	    {
+		    throw new NotImplementedException();
+	    }
 
-
-        public void Success(string title, string message)
-        {
-            _snackbar.Add(message, Severity.Success);
-        }
-
-        public void Info(string title, string message)
-        {
-            _snackbar.Add(message, Severity.Info);
-        }
-
-        public void Warning(string title, string message)
-        {
-            _snackbar.Add(message, Severity.Warning);
-        }
-
-        public void Error(string title, string message)
-        {
-            _snackbar.Add(message, Severity.Error);
-        }
+	    public void Error(string title, string message)
+	    {
+		    throw new NotImplementedException();
+	    }
     }
 }
