@@ -1,0 +1,30 @@
+﻿@using System.Globalization
+<g transform="@GetTransform()">
+    <CascadingValue Value="@GetArea()">@ChildContent</CascadingValue>
+</g>
+
+@code {
+
+
+    [Parameter()]
+    public float Scale { get; set; } = 1;
+
+    [Parameter()]
+    public RenderFragment ChildContent { get; set; }
+
+    private float EffectiveWidth => Area.Size.X / Scale;
+
+    private float EffectiveHeight => Area.Size.Y / Scale;
+
+
+    [CascadingParameter()]
+    public DrawArea Area { get; set; } = new ();
+
+    private string GetTransform() => $"scale({Scale.ToString(_neutral)})";
+
+    private DrawArea GetArea() => Area.SetSize(EffectiveWidth, EffectiveHeight);
+
+
+    private static readonly IFormatProvider _neutral = CultureInfo.InvariantCulture;
+
+}

@@ -1,0 +1,30 @@
+﻿@using Ambacht.Common.Mathmatics
+<SvgScale Scale="@GetEffectiveScale()">
+    <SvgTranslate DX="@(-Bounds.Left)" DY="@(-Bounds.Top)">
+        @ChildContent
+    </SvgTranslate>
+</SvgScale>
+
+@code {
+
+    // These bounds will be contained
+    [Parameter()]
+    public Rectangle Bounds { get; set; }
+
+    [Parameter()]
+    public RenderFragment ChildContent { get; set; }
+
+
+    [CascadingParameter()]
+    public DrawArea DrawArea { get; set; }
+
+
+    private float GetEffectiveScale()
+    {
+        var scaleX = DrawArea.Size.X / Bounds.Width;
+        var scaleY = DrawArea.Size.Y / Bounds.Height;
+        return Math.Min(scaleX, scaleY);
+    }
+
+
+}

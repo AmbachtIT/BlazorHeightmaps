@@ -1,0 +1,53 @@
+﻿@typeparam T where T: class
+    <MudGrid Spacing="@Spacing">
+        @foreach (var item in Items)
+        {
+            <MudItem xs="12" sm="6" lg="@(12 / Tiles)">
+                <div style="@GetStyle(item)">
+                    <MudButton OnClick="@(async () => await Select(item))" FullWidth="true" Style="min-height:14.5rem;padding:1.5rem">
+                        @ChildContent(item)
+                    </MudButton>
+                </div>
+            </MudItem>
+        }
+    </MudGrid>
+
+@code {
+
+    [Parameter()]
+    public int Tiles { get; set; } = 3;
+
+
+    [Parameter()]
+    public int Spacing { get; set; } = 1;
+
+    [Parameter()]
+    public IEnumerable<T> Items { get; set; } = Array.Empty<T>();
+
+    [Parameter()]
+    public T SelectedItem { get; set; }
+
+    [Parameter()]
+    public EventCallback<T> SelectedItemChanged { get; set; }
+
+    [Parameter()]
+    public RenderFragment<T> ChildContent { get; set; }
+
+
+    private async Task Select(T item)
+    {
+        SelectedItem = item;
+        await SelectedItemChanged.InvokeAsync(item);
+    }
+
+    private string GetStyle(T item)
+    {
+        if (item == SelectedItem)
+        {
+            return "border: 2px solid #ffa800;border-radius: 0.625rem;";
+        }
+        return "border: 1px solid #bbbbbb;border-radius: 0.625rem;";
+    }
+
+
+}

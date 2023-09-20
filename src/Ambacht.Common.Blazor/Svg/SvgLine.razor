@@ -1,0 +1,24 @@
+﻿<line x1="@X1" y1="@Y1" x2="@X2" y2="@Y2" @attributes="@Attributes"></line>
+
+@code {
+
+    [Parameter()]
+    public Vector2 From { get; set; }
+
+    [Parameter()]
+    public Vector2 To { get; set; }
+
+    [CascadingParameter()]
+    public DrawArea Area { get; set; } = new();
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Attributes { get; set; }
+
+
+
+    private float X1 => Area.Transform(From).X;
+    private float Y1 => Area.Transform(From).Y;
+    private float X2 => Area.Transform(To).X;
+    private float Y2 => Area.Transform(To).Y;
+
+}

@@ -1,0 +1,33 @@
+﻿@using Ambacht.Common.Mathmatics
+<CascadingValue Value="@View">
+    @ChildContent
+</CascadingValue>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (View != null)
+        {
+            View.Size = Area.Size;
+        }
+    }
+
+    
+
+    [Parameter()]
+    public WorldView View { get; set; }
+
+    [Parameter()]
+    public RenderFragment ChildContent { get; set; }
+
+    [CascadingParameter()]
+    public DrawArea Area { get; set; }
+
+
+
+
+
+
+}

@@ -1,0 +1,22 @@
+﻿@inherits SvgMapComponent
+<line x1="@T1.X" y1="@T1.Y" x2="@T2.X" y2="@T2.Y" @attributes="@Attributes" />
+
+@code {
+
+
+    [Parameter()]
+    public Vector2 V1 { get; set; }
+
+    private Vector2 T1 => View.WorldToScreen(V1);
+
+    [Parameter()]
+    public Vector2 V2 { get; set; }
+
+    private Vector2 T2 => View.WorldToScreen(V2);
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Attributes { get; set; }
+
+
+
+}

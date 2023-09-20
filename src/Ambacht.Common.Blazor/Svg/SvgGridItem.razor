@@ -1,0 +1,52 @@
+﻿@implements IDisposable
+<SvgTranslate
+    DX="@_position.X"
+    DY="@_position.Y"
+    Width="@_size.X"
+    Height="@_size.Y">
+    <SvgChildMeasurer @ref="_measurer">
+        @ChildContent
+    </SvgChildMeasurer>
+</SvgTranslate>
+
+@code {
+
+    private Vector2 _position;
+    private Vector2 _size;
+
+    [Parameter()]
+    public RenderFragment ChildContent { get; set; }
+
+    [CascadingParameter()]
+    public SvgGrid Parent { get; set; }
+
+    private SvgChildMeasurer _measurer = new();
+
+    internal Vector2? Measure() => _measurer.Measure();
+
+    internal void Layout(Vector2 position, Vector2 size)
+    {
+        this._position = position;
+        this._size = size;
+        StateHasChanged();
+    }
+    
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (Parent == null)
+        {
+            throw new ArgumentNullException();
+        }
+        Parent.Register(this);
+    }
+
+    public void Dispose()
+    {
+        if (Parent != null)
+        {
+            Parent.Unregister(this);
+        }
+    }
+
+}

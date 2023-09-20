@@ -1,0 +1,92 @@
+﻿@using Ambacht.Common.Blazor.Svg
+<rect x="@Value.Left" y="@Value.Top" width="@Value.Width" height="@Value.Height" fill="@Fill" stroke="@Stroke" stroke-width="@StrokeWidth" />
+@if (IsEditable)
+{
+    @if (!LockedSides.HasFlag(RectangleSide.Top))
+    {
+        <SvgDragHandle DragDirection="SvgDragDirection.Vertical"
+                       Position="@PosHandleY2"
+                       Dragged="@DragY2" />
+    }
+
+    @if (!LockedSides.HasFlag(RectangleSide.Bottom))
+    {
+        <SvgDragHandle DragDirection="SvgDragDirection.Vertical"
+                       Position="@PosHandleY1"
+                       Dragged="@DragY1" />
+    }
+
+
+    @if (!LockedSides.HasFlag(RectangleSide.Left))
+    {
+        <SvgDragHandle DragDirection="SvgDragDirection.Horizontal"
+                       Position="@PosHandleLeft"
+                       Dragged="@DragLeft" />
+    }
+
+    @if (!LockedSides.HasFlag(RectangleSide.Right))
+    {
+        <SvgDragHandle DragDirection="SvgDragDirection.Horizontal"
+                       Position="@PosHandleRight"
+                       Dragged="@DragRight" />
+    }
+}
+
+@code {
+
+
+    [Parameter()]
+    public bool IsEditable { get; set; }
+
+    [Parameter()]
+    public string Fill { get; set; } = "none";
+
+    [Parameter()]
+    public string Stroke { get; set; } = "#000000";
+
+    [Parameter()]
+    public RectangleSide LockedSides { get; set; }
+
+    /// <summary>
+    /// Rectangle in screen coordinates
+    /// </summary>
+    [Parameter()]
+    public Rectangle Value { get; set; }
+
+    [Parameter()]
+    public EventCallback<Rectangle> ValueChanged { get; set; }
+
+    private float StrokeWidth => IsEditable ? 2 : 1;
+
+    private Vector2 PosHandleY1 => new Vector2(Value.Center().X, Value.Bottom + SvgDragHandle.Offset);
+    private Vector2 PosHandleY2 => new Vector2(Value.Center().X, Value.Top - SvgDragHandle.Offset);
+
+    private Vector2 PosHandleLeft => new Vector2(Value.Left + -SvgDragHandle.Offset, Value.Center().Y);
+    private Vector2 PosHandleRight => new Vector2(Value.Right + SvgDragHandle.Offset, Value.Center().Y);
+
+    private async Task DragY1(Vector2 delta)
+    {
+        Value = Value.DragTop(delta.Y);
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task DragY2(Vector2 delta)
+    {
+        Value = Value.DragBottom(delta.Y);
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task DragLeft(Vector2 delta)
+    {
+        Value = Value.DragLeft(delta.X);
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task DragRight(Vector2 delta)
+    {
+        Value = Value.DragRight(delta.X);
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+
+}

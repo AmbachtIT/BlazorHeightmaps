@@ -1,0 +1,151 @@
+﻿<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code {
+
+    [Parameter()]
+    public SvgLength[] ColumnSizes { get; set; } = Array.Empty<SvgLength>();
+
+    private int Columns => ColumnSizes.Length;
+
+    [Parameter()]
+    public SvgLength[] RowSizes { get; set; } = Array.Empty<SvgLength>();
+
+    private int Rows => RowSizes.Length;
+
+    [Parameter()]
+    public RenderFragment ChildContent { get; set; }
+
+
+    [CascadingParameter()]
+    public DrawArea Area { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            Layout();
+            StateHasChanged();
+        }
+    }
+
+    private void Layout()
+    {
+        var widths = GetColumnWidths();
+        var heights = GetRowHeights();
+
+        var index = 0;
+        var y = 0f;
+        for (var row = 0; row < Rows; row++)
+        {
+            var x = 0f;
+            for (var column = 0; column < Columns; column++)
+            {
+                if (index < _items.Count)
+                {
+                    var item = _items[index++];
+
+                    item.Layout(
+                    new Vector2(x, y),
+                        new Vector2(widths[column], heights[row]));
+                }
+                x += widths[column];
+            }
+            y += heights[row];
+        }
+    }
+
+
+    private float[] GetColumnWidths()
+    {
+        var available = Area.Size.X;
+        var sizes = ColumnSizes.ToArray();
+        for (var s = 0; s < sizes.Length; s++)
+        {
+            if (sizes[s] is SvgAutoLength)
+            {
+                sizes[s] = SvgLength.Px(MeasureColumn(s));
+            }
+        }
+        return 
+            SvgLength
+                .GetSizes(available, sizes)
+                .Select(p => p.Amount)
+                .ToArray();
+    }
+
+    private float[] GetRowHeights()
+    {
+        var available = Area.Size.Y;
+        var sizes = RowSizes.ToArray();
+        for (var s = 0; s < sizes.Length; s++)
+        {
+            if (sizes[s] is SvgAutoLength)
+            {
+                sizes[s] = SvgLength.Px(MeasureRow(s));
+            }
+        }
+        return 
+            SvgLength
+                .GetSizes(available, sizes)
+                .Select(p => p.Amount)
+                .ToArray();
+    }
+
+
+    private float MeasureColumn(int column)
+    {
+        var result = 0f;
+        for (var row = 0; row < Rows; row++)
+        {
+            var item = GetItem(row, column);
+            if (item != null)
+            {
+                result = Math.Max(result, item.Measure()?.X ?? 0f);
+            }
+        }
+        return (float)Math.Round(result);
+    }
+
+    private float MeasureRow(int row)
+    {
+        var result = 0f;
+        for (var column = 0; column < Columns; column++)
+        {
+            var item = GetItem(row, column);
+            result = Math.Max(result, item.Measure()?.Y ?? 0f);
+        }
+        return (float)Math.Round(result);
+    }
+
+
+
+
+    private SvgGridItem GetItem(int row, int column)
+    {
+        var index = row * Columns + column;
+        if (index < _items.Count)
+        {
+            return _items[index];
+        }
+        return null;
+    }
+
+    public void Register(SvgGridItem item)
+    {
+        _items.Add(item);
+    }
+
+    public void Unregister(SvgGridItem item)
+    {
+        _items.Remove(item);
+    }
+
+    private readonly List<SvgGridItem> _items = new List<SvgGridItem>();
+
+
+
+
+}

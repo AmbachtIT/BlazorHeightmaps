@@ -1,0 +1,55 @@
+﻿@typeparam T
+@foreach (var item in GetItems())
+{
+    <SvgTranslate DY="@item.Y" Width="@item.Width" Height="@item.Height">
+        @ItemTemplate(item.Value)
+    </SvgTranslate>
+}
+
+@code {
+
+    [Parameter()]
+    public IList<T> Items { get; set; }
+
+    [Parameter()]
+    public float Gutter { get; set; }
+
+    [Parameter()]
+    public RenderFragment<T> ItemTemplate { get; set; }
+
+    [CascadingParameter()]
+    public DrawArea Area { get; set; }
+
+    private IEnumerable<Item> GetItems()
+    {
+        if (!Items.Any())
+        {
+            yield break;
+        }
+
+        var itemHeightIncludingGutter = (Area.Size.Y + Gutter) / Items.Count;
+        var itemHeight = itemHeightIncludingGutter - Gutter;
+
+        var y = 0f;
+        foreach (var item in Items)
+        {
+            yield return new Item()
+            {
+                Value = item,
+                Y = y,
+                Height = itemHeight,
+                Width = Area.Size.X
+            };
+            y += itemHeightIncludingGutter;
+        }
+    }
+
+    private class Item
+    {
+        public float Y { get; set; }
+        public float Width { get; set; }
+        public float Height { get; set; }
+        public T Value { get; set; }
+    }
+
+}

@@ -4,13 +4,6 @@ module.exports = {
     './src/**/*.html',
     './src/**/*.razor',
   ],
-  purge: {
-    enabled: true,
-    content: [
-      './src/**/*.html',
-      './src/**/*.razor'
-    ],
-  },
   theme: {
     extend: {},
   },

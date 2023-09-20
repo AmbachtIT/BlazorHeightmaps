@@ -1,0 +1,22 @@
+﻿<text x="@X" y="@Y" @attributes="@Attributes">@ChildContent</text>
+
+@code {
+
+    [Parameter()]
+    public Vector2 Pos { get; set; }
+
+    [Parameter()]
+    public RenderFragment ChildContent { get; set; }
+
+    [CascadingParameter()]
+    public DrawArea Area { get; set; } = new();
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Attributes { get; set; }
+
+
+
+    private float X => Area.Transform(Pos).X;
+    private float Y => Area.Transform(Pos).Y;
+
+}

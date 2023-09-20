@@ -1,0 +1,41 @@
+﻿@using Ambacht.Common.Blazor.Services
+@inject IJavascriptUtilService JavascriptUtil
+<svg width="100%" viewBox="@Viewbox" @attributes="@Attributes" @ref="_svg">
+    <CascadingValue Value="area">
+        @ChildContent
+    </CascadingValue>
+</svg>
+
+@code {
+
+    private string Viewbox => $"0 0 {Width} {Height}";
+
+    [Parameter()]
+    public int Width { get; set; } = 1000;
+
+    [Parameter()]
+    public int Height { get; set; } = 750;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Attributes { get; set; }
+
+
+    [Parameter()]
+    public RenderFragment ChildContent { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        area = new DrawArea(Width, Height);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var bounds = await JavascriptUtil.GetBounds(_svg);
+        area.SvgPixelSize = bounds.Size;
+    }
+
+    private DrawArea area = new DrawArea();
+    private ElementReference _svg;
+
+}

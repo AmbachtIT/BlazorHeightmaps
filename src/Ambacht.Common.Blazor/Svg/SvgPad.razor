@@ -1,0 +1,52 @@
+﻿<g transform="@GetTransform()">
+    <CascadingValue Value="@GetArea()">@ChildContent</CascadingValue>
+</g>
+
+@code {
+
+    [Parameter()]
+    public float? All { get; set; }
+
+    [Parameter()]
+    public float? Horizontal { get; set; }
+
+    [Parameter()]
+    public float? Vertical { get; set; }
+
+    [Parameter()]
+    public float? Top { get; set; }
+
+    [Parameter()]
+    public float? Bottom { get; set; }
+
+    [Parameter()]
+    public float? Left { get; set; }
+
+    [Parameter()]
+    public float? Right { get; set; }
+
+    [Parameter()]
+    public RenderFragment ChildContent { get; set; }
+
+    [CascadingParameter()]
+    public DrawArea Area { get; set; } = new ();
+
+
+    private float EffectiveLeft => Left ?? Horizontal ?? All ?? 0f;
+
+    private float EffectiveRight => Right ?? Horizontal ?? All ?? 0f;
+
+    private float EffectiveTop => Top ?? Vertical ?? All ?? 0f;
+
+    private float EffectiveBottom => Bottom ?? Vertical ?? All ?? 0f;
+
+    private float EffectiveWidth => Math.Max(Area.Size.X - EffectiveLeft - EffectiveRight, 0f);
+
+    private float EffectiveHeight => Math.Max(Area.Size.Y - EffectiveTop - EffectiveBottom, 0f);
+
+    
+    private string GetTransform() => $"translate({EffectiveLeft}, {EffectiveTop})";
+
+    private DrawArea GetArea() => new DrawArea(EffectiveWidth, EffectiveHeight);
+
+}

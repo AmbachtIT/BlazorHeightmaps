@@ -1,0 +1,54 @@
+﻿<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code {
+
+    [Parameter()]
+    public RenderFragment ChildContent { get; set; }
+
+
+    public void Register(object sender, Func<Vector2> func)
+    {
+        if (children.Any(c => c.Item1 == sender))
+        {
+            throw new InvalidOperationException("Object is already registered");
+        }
+        children.Add(Tuple.Create(sender, func));
+    }
+
+    public void Unregister(object sender)
+    {
+        children.RemoveAll(c => c.Item1 == sender);
+    }
+
+    private List<Tuple<object, Func<Vector2>>> children = new();
+
+
+
+    public IEnumerable<Tuple<object, Vector2>> MeasureAll()
+    {
+        foreach (var child in children)
+        {
+            yield return Tuple.Create(child.Item1, child.Item2());
+        }
+    }
+
+    public Vector2? Measure()
+    {
+        Vector2? result = null;
+        foreach (var tup in MeasureAll())
+        {
+            if (result == null)
+            {
+                result = tup.Item2;
+            }
+            else
+            {
+                result = Vector2.Max(result.Value, tup.Item2);
+            }
+        }
+        return result;
+    }
+
+}

@@ -14,6 +14,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		tailwind.config.js = tailwind.config.js
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ambacht", "ambacht", "{C6DFB23E-A7F4-4D02-B210-51081230D21F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambacht.Common", "src\Ambacht.Common\Ambacht.Common.csproj", "{419B37BF-FD93-46A8-A6FE-BD0E50E85568}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambacht.Common.Blazor", "src\Ambacht.Common.Blazor\Ambacht.Common.Blazor.csproj", "{B4E77C91-5510-463A-B5AF-4311DAFD0F44}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambacht.Common.Maps", "src\Ambacht.Common.Maps\Ambacht.Common.Maps.csproj", "{19A604C2-2748-447D-BC78-63C5DDA9EFEE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambacht.OpenData.Sources.Ahn", "src\Ambacht.OpenData.Sources.Ahn\Ambacht.OpenData.Sources.Ahn.csproj", "{5D1240A1-1356-49D7-B9F4-CB30F6F5D33D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,9 +34,31 @@ Global
 		{3F6CBBFF-9D77-4E2A-BAF6-BCDF0A764F85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F6CBBFF-9D77-4E2A-BAF6-BCDF0A764F85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F6CBBFF-9D77-4E2A-BAF6-BCDF0A764F85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{419B37BF-FD93-46A8-A6FE-BD0E50E85568}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{419B37BF-FD93-46A8-A6FE-BD0E50E85568}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{419B37BF-FD93-46A8-A6FE-BD0E50E85568}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{419B37BF-FD93-46A8-A6FE-BD0E50E85568}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4E77C91-5510-463A-B5AF-4311DAFD0F44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4E77C91-5510-463A-B5AF-4311DAFD0F44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4E77C91-5510-463A-B5AF-4311DAFD0F44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4E77C91-5510-463A-B5AF-4311DAFD0F44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19A604C2-2748-447D-BC78-63C5DDA9EFEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19A604C2-2748-447D-BC78-63C5DDA9EFEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19A604C2-2748-447D-BC78-63C5DDA9EFEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19A604C2-2748-447D-BC78-63C5DDA9EFEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D1240A1-1356-49D7-B9F4-CB30F6F5D33D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D1240A1-1356-49D7-B9F4-CB30F6F5D33D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D1240A1-1356-49D7-B9F4-CB30F6F5D33D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D1240A1-1356-49D7-B9F4-CB30F6F5D33D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{419B37BF-FD93-46A8-A6FE-BD0E50E85568} = {C6DFB23E-A7F4-4D02-B210-51081230D21F}
+		{B4E77C91-5510-463A-B5AF-4311DAFD0F44} = {C6DFB23E-A7F4-4D02-B210-51081230D21F}
+		{19A604C2-2748-447D-BC78-63C5DDA9EFEE} = {C6DFB23E-A7F4-4D02-B210-51081230D21F}
+		{5D1240A1-1356-49D7-B9F4-CB30F6F5D33D} = {C6DFB23E-A7F4-4D02-B210-51081230D21F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4EE962FA-3BF7-4C0A-8FFB-43A1669F9B30}

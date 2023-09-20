@@ -1,0 +1,52 @@
+﻿@inherits Ambacht.Common.Blazor.Components.DraggableComponent
+<text 
+    x="@Position.X" y="@Position.Y" 
+    text-anchor="middle" 
+    dominant-baseline="middle" 
+    cursor="move"
+    style="user-select: none; font-size: 1.5em; cursor: pointer; touch-action: none;"
+    onmousedown="@OnMouseDown"
+    ontouchstart="@OnTouchStart" @ontouchstart:preventDefault>@Glyph</text>
+
+@code {
+
+    [Parameter()]
+    public SvgDragDirection DragDirection { get; set; } = SvgDragDirection.Both;
+
+    [Parameter()]
+    public Vector2 Position { get; set; }
+
+    [CascadingParameter()]
+    public DrawArea Area { get; set; }
+
+    [CascadingParameter()] 
+    public WorldView View { get; set; }
+
+    private float UnitsPerPixel => Area.Size.X / Area.SvgPixelSize.X;
+
+    public override async Task OnDrag(Vector2 v)
+    {
+        await base.OnDrag(GetDelta(v) * UnitsPerPixel);
+    }
+
+
+    private Vector2 GetDelta(Vector2 v) => DragDirection switch
+    {
+        SvgDragDirection.Both => new (v.X, v.Y),
+        SvgDragDirection.Horizontal => new (v.X, 0f),
+        SvgDragDirection.Vertical => new (0f, v.Y),
+        _ => Vector2.Zero
+    };
+
+
+    private string Glyph => DragDirection switch
+    {
+        SvgDragDirection.Horizontal => "↔",
+        SvgDragDirection.Vertical => "↕",
+        SvgDragDirection.Both => "✥",
+        _ => "?"
+    };
+
+    public const float Offset = 16f;
+
+}

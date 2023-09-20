@@ -1,0 +1,103 @@
+﻿<div
+    onmouseup="@OnMouseUp"
+    onmouseleave="@OnMouseLeave"
+    onmousemove="@OnMouseMove"
+     ontouchend="@OnTouchEnd" @ontouchend:preventDefault
+     ontouchcancel="@OnTouchCancel" @ontouchcancel:preventDefault
+    ontouchmove="@OnTouchMove" @ontouchmove:preventDefault
+    style="touch-action: none;">
+    <CascadingValue Value="this">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+@code {
+    [Parameter()]
+    public RenderFragment ChildContent { get; set; }
+
+
+    #region Mouse
+
+    public void OnMouseDown(DraggableComponent draggable, MouseEventArgs e) => StartDrag(draggable);
+
+    private async Task OnMouseMove(MouseEventArgs e)
+    {
+        await OnDrag(new((float)e.MovementX, (float)e.MovementY));
+    }
+    
+    private void OnMouseUp(MouseEventArgs e) => CancelDrag();
+
+    private void OnMouseLeave(MouseEventArgs e) => CancelDrag();
+
+
+    #endregion
+
+    #region Touch events
+
+    public void OnTouchStart(DraggableComponent draggable, TouchEventArgs e)
+    {
+        var active = e.ChangedTouches.First();
+        _activeTouchId = active.Identifier;
+        _lastTouchPos = GetPos(active);
+        StartDrag(draggable);
+    }
+
+    private async Task OnTouchMove(TouchEventArgs e)
+    {
+        var active = e.ChangedTouches.SingleOrDefault(e => e.Identifier == _activeTouchId);
+        if (active != null)
+        {
+            var currentPos = GetPos(active);
+            var delta = currentPos - _lastTouchPos;
+            _lastTouchPos = currentPos;
+
+            await OnDrag(delta);
+        }
+    }
+
+    private void OnTouchEnd(TouchEventArgs e) => CancelDrag();
+
+    private void OnTouchCancel(TouchEventArgs e) => CancelDrag();
+
+    private Vector2 GetPos(TouchPoint active) => new Vector2((float)active.PageX, (float)active.PageY);
+
+
+    private long? _activeTouchId;
+    private Vector2 _lastTouchPos = Vector2.Zero;
+
+
+    #endregion
+
+
+
+
+
+    #region Dragging
+
+
+    private void StartDrag(DraggableComponent draggable)
+    {
+        _dragging = draggable;
+    }
+
+    private async Task OnDrag(Vector2 delta)
+    {
+        if (_dragging != null)
+        {
+            if (delta.Length() > 0)
+            {
+                await _dragging.OnDrag(delta);
+            }
+        }
+    }
+
+    private void CancelDrag()
+    {
+        _dragging = null;
+    }
+
+    private DraggableComponent _dragging = null;
+
+    #endregion
+
+}

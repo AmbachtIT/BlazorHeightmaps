@@ -1,0 +1,78 @@
+﻿@typeparam TItem
+@implements IMultipleSelectionDialog<TItem>
+<MudDialog OnBackdropClick="@Cancel">
+    <DialogContent>
+        <MudContainer Style="max-height: 60vh; overflow-y: scroll;">
+            <MudGrid Spacing="4">
+                @foreach (var option in AvailableOptions)
+                {
+                    <MudItem lg="6">
+                        <div class="@MudItemClass(option)">
+                            <DynamicComponent Type="@ComponentType" Parameters="@GetComponentParameters(option)"></DynamicComponent>
+                        </div>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudContainer>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Confirm" Color="Color.Primary">Confirm</MudButton>
+        <MudButton OnClick="@Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    /// <summary>
+    /// Variables to choose from
+    /// </summary>
+    [Parameter()]
+    public IEnumerable<TItem> AvailableOptions { get; set; } = Array.Empty<TItem>();
+
+    [Parameter()]
+    public Type ComponentType { get; set; }
+
+    [Parameter()]
+    public List<TItem> SelectedOptions { get; set; } = new List<TItem>();
+
+    [CascadingParameter] 
+    MudDialogInstance MudDialog { get; set; }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private Dictionary<string, object> GetComponentParameters(TItem option)
+    {
+        return new Dictionary<string, object>()
+        {
+            { "Value", option },
+            { "OnClick", new EventCallbackFactory().Create(this, () => Select(option)) },
+        };
+    }
+
+    private string MudItemClass(TItem variable)
+    {
+        if (SelectedOptions.Contains(variable))
+        {
+            return "border-solid border-2 mud-border-primary";
+        }
+        return "border-hidden border-2";
+    }
+
+    private void Select(TItem variable)
+    {
+        if (SelectedOptions.Contains(variable))
+        {
+            SelectedOptions.Remove(variable);
+        }
+        else
+        {
+            SelectedOptions.Add(variable);
+        }
+    }
+
+    private void Confirm()
+    {
+        MudDialog.Close(SelectedOptions);
+    }
+
+}

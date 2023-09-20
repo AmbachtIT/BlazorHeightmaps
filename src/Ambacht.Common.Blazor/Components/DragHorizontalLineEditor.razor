@@ -1,0 +1,89 @@
+﻿@using Ambacht.Common.Blazor.Svg
+<line x1="@X1" y1="@Y" x2="@X2" y2="@Y" stroke="@Stroke" stroke-width="4" />
+@if (IsEditable)
+{
+    @if (!LockedSides.HasFlag(RectangleSide.Top))
+    {
+        <SvgDragHandle 
+            DragDirection="SvgDragDirection.Vertical" 
+            Position="@PosHandleTop"
+            Dragged="@DragY"/>
+    }
+    @if (!LockedSides.HasFlag(RectangleSide.Bottom))
+    {
+        <SvgDragHandle 
+            DragDirection="SvgDragDirection.Vertical" 
+            Position="@PosHandleBottom"
+            Dragged="@DragY"/>
+    }
+
+    @if (!LockedSides.HasFlag(RectangleSide.Left))
+    {
+        <SvgDragHandle 
+            DragDirection="SvgDragDirection.Horizontal" 
+            Position="@PosHandleX1"
+            Dragged="@DragX1"/>
+    }
+
+    @if (!LockedSides.HasFlag(RectangleSide.Right))
+    {
+        <SvgDragHandle DragDirection="SvgDragDirection.Horizontal"
+                       Position="@PosHandleX2"
+                       Dragged="@DragX2"/>
+    }
+}
+
+
+@code {
+
+    [Parameter()]
+    public bool IsEditable { get; set; }
+
+    [Parameter()]
+    public string Stroke { get; set; }
+
+    [Parameter()]
+    public float X1 { get; set; }
+
+    [Parameter()]
+    public EventCallback<float> X1Changed { get; set; }
+
+    [Parameter()]
+    public float X2 { get; set; }
+
+    [Parameter()]
+    public EventCallback<float> X2Changed { get; set; }
+
+    [Parameter()]
+    public float Y { get; set; }
+
+    [Parameter()]
+    public EventCallback<float> YChanged { get; set; }
+
+    [Parameter()]
+    public RectangleSide LockedSides { get; set; }
+
+    private Vector2 PosHandleX1 => new Vector2(X1 - SvgDragHandle.Offset, Y);
+    private Vector2 PosHandleX2 => new Vector2(X2 + SvgDragHandle.Offset, Y);
+    private Vector2 PosHandleTop => new Vector2((X1 + X2) / 2, Y - SvgDragHandle.Offset);
+    private Vector2 PosHandleBottom => new Vector2((X1 + X2) / 2, Y + SvgDragHandle.Offset);
+
+    private async Task DragX1(Vector2 delta)
+    {
+        X1 = Math.Min(X1 + delta.X, X2);
+        await X1Changed.InvokeAsync(X1);
+    }
+
+    private async Task DragX2(Vector2 delta)
+    {
+        X2 = Math.Max(X2 + delta.X, X1);
+        await X2Changed.InvokeAsync(X2);
+    }
+
+    private async Task DragY(Vector2 delta)
+    {
+        Y += delta.Y;
+        await YChanged.InvokeAsync(Y);
+    }
+
+}

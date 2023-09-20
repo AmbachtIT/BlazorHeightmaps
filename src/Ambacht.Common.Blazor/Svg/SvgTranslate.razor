@@ -1,0 +1,36 @@
+﻿<g transform="@GetTransform()">
+    <CascadingValue Value="@GetArea()">@ChildContent</CascadingValue>
+</g>
+
+@code {
+
+
+    [Parameter()]
+    public float DX { get; set; }
+
+    [Parameter()]
+    public float DY { get; set; }
+
+    [Parameter()]
+    public float? Width { get; set; }
+
+    [Parameter()]
+    public float? Height { get; set; }
+
+    [Parameter()]
+    public RenderFragment ChildContent { get; set; }
+
+    private float EffectiveWidth => Math.Max(Width ?? Area.Size.X - DX, 0f);
+
+    private float EffectiveHeight => Math.Max(Height ?? Area.Size.Y - DY, 0f);
+
+
+    [CascadingParameter()]
+    public DrawArea Area { get; set; } = new ();
+
+    private string GetTransform() => $"translate({DX}, {DY})";
+
+    private DrawArea GetArea() => Area.SetSize(EffectiveWidth, EffectiveHeight);
+
+
+}

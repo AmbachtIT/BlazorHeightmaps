@@ -1,0 +1,112 @@
+﻿<g>
+    <SvgTranslate Width="@GetSize1().X" Height="@GetSize1().Y" DX="@GetPos1().X" DY="@GetPos1().Y">
+        <SvgChildMeasurer @ref="_measure1">
+            @if (!Flip)
+            {
+                @Panel1
+            }
+            else
+            {
+                @Panel2
+            }
+        </SvgChildMeasurer>
+    </SvgTranslate>
+    <SvgTranslate Width="@GetSize2().X" Height="@GetSize2().Y" DX="@GetPos2().X" DY="@GetPos2().Y">
+        <SvgChildMeasurer @ref="_measure2">
+            @if (!Flip)
+            {
+                @Panel2
+            }
+            else
+            {
+                @Panel1
+            }
+        </SvgChildMeasurer>
+    </SvgTranslate>
+</g>
+
+
+@code {
+
+    [Parameter()]
+    public float? Size1 { get; set; }
+
+    [CascadingParameter()]
+    public DrawArea Area { get; set; }
+
+    [Parameter()]
+    public RenderFragment Panel1 { get; set; }
+
+    [Parameter()]
+    public RenderFragment Panel2 { get; set; }
+
+    [Parameter()]
+    public DrawAxis Axis { get; set; } = DrawAxis.X;
+
+    /// <summary>
+    /// Enable to flip panels 1 and 2
+    /// </summary>
+    [Parameter()]
+    public bool Flip { get; set; }
+
+
+    private DrawAxis Cross => Axis.GetPerpendicularAxis();
+
+    private SvgChildMeasurer _measure1, _measure2;
+
+    private Vector2 GetSize1()
+    {
+        return Axis.Transform(GetEffectiveSplit(), Cross.GetValue(Area.Size));
+    }
+
+    private Vector2 GetSize2()
+    {
+        return Axis.Transform(Axis.GetValue(Area.Size) - GetEffectiveSplit(), Cross.GetValue(Area.Size));
+    }
+
+    private Vector2 GetPos1() => new();
+
+    private Vector2 GetPos2() => Axis.Transform(GetEffectiveSplit(), 0);
+
+
+    private float GetEffectiveSplit()
+    {
+        var size = Axis.GetValue(Area.Size);
+        // If a split value is explicitly specified, respect it.
+        if (Size1.HasValue)
+        {
+            if (Flip)
+            {
+                return size - Size1.Value;
+            }
+            return Size1.Value;
+        }
+
+        var desired1 = Axis.GetValue(_measure1?.Measure() ?? new());
+        var desired2 = Axis.GetValue(_measure2?.Measure() ?? new());
+
+        if (desired1 <= 0 && desired2 <= 0)
+        {
+            // If no desired widths are known, use an equal split
+            return size / 2f;
+        }
+
+        if (desired1 > 0)
+        {
+            if (desired2 > 0)
+            {
+                // If both the left panel and the right panel have a desired width,
+                // divide the remaining space equally
+                var gutter = size - desired1 - desired2;
+                return desired1 + gutter / 2f;
+            }
+
+            // The left panel gets the desired space, the right panel gets the rest
+            return desired1;
+        }
+
+        // The right panel gets the desired space, the left panel gets the rest
+        return size - desired2;
+    }
+
+}

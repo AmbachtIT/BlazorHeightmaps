@@ -1,0 +1,46 @@
+﻿
+<rect x="@BottomLeft.X" y="@BottomLeft.Y" width="@TransformedSize.X" height="@TransformedSize.Y" fill="@Fill" stroke="@Stroke" @attributes="@Attributes" />
+
+@code {
+
+    [Parameter()]
+    public Vector2 Position { get; set; }
+
+    [Parameter()]
+    public Vector2 Size { get; set; }
+
+    private Vector2 P1 => Area.Transform(Position);
+    private Vector2 P2 => Area.Transform(Position + Size);
+
+
+    private Vector2 BottomLeft => Vector2.Min(P1, P2);
+    private Vector2 TopRight => Vector2.Max(P1, P2);
+    private Vector2 TransformedSize => new(TopRight.X - BottomLeft.X, TopRight.Y - BottomLeft.Y);
+
+
+    [Parameter()]
+    public IEnumerable<Vector2> Points { get; set; }
+
+    [Parameter()]
+    public string Fill { get; set; } = "black";
+
+    [Parameter()]
+    public string Stroke { get; set; } = "none";
+
+
+    [CascadingParameter()]
+    public DrawArea Area { get; set; } = new();
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Attributes { get; set; }
+
+    private string GetPoints()
+    {
+        return 
+            Points
+                .ToList()
+                .Downsample(Area.Size)
+                .ToSvgPoints();
+    }
+
+}

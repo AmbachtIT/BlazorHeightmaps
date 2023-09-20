@@ -1,0 +1,30 @@
+﻿<polyline fill="@Fill" stroke="@Stroke" points="@GetPoints()" @attributes="@Attributes" />
+
+@code {
+
+    [Parameter()]
+    public IEnumerable<Vector2> Points { get; set; }
+
+    [Parameter()]
+    public string Fill { get; set; } = "none";
+
+    [Parameter()]
+    public string Stroke { get; set; } = "black";
+
+
+    [CascadingParameter()]
+    public DrawArea Area { get; set; } = new();
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Attributes { get; set; }
+
+    private string GetPoints()
+    {
+        return 
+            Points
+                .ToList()
+                .Downsample(Area.Size)
+                .ToSvgPoints();
+    }
+
+}

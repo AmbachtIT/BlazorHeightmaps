@@ -1,0 +1,11 @@
+﻿<rect width="@Area.Size.X" height="@Area.Size.Y" fill="@Fill"></rect>
+
+@code {
+
+    [CascadingParameter()]
+    public DrawArea Area { get; set; }
+
+    [Parameter()]
+    public string Fill { get; set; }
+
+}

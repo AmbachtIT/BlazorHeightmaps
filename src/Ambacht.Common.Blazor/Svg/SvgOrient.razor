@@ -1,0 +1,65 @@
+﻿<CascadingValue Value="@GetArea()">
+    <g transform="@GetTransform()">@ChildContent</g>
+</CascadingValue>
+
+@code {
+
+    [Parameter()]
+    public DrawAxis MainAxis { get; set; } = DrawAxis.X;
+
+    [Parameter()]
+    public DrawDirection MainDirection { get; set; } = DrawDirection.Normal;
+
+    [Parameter()]
+    public DrawDirection CrossDirection { get; set; } = DrawDirection.Normal;
+
+    [Parameter()]
+    public RenderFragment ChildContent { get; set; }
+
+    [CascadingParameter()]
+    public DrawArea Area { get; set; } = new ();
+
+    private DrawArea GetArea()
+    {
+        return Area.SetOrientation(MainAxis, MainDirection, CrossDirection);
+    }
+
+    private DrawDirection GetXDirection()
+    {
+        if (MainAxis == DrawAxis.X)
+        {
+            return MainDirection;
+        }
+        return CrossDirection;
+    }
+
+    private DrawDirection GetYDirection()
+    {
+        if (MainAxis == DrawAxis.X)
+        {
+            return CrossDirection;
+        }
+        return MainDirection;
+    }
+
+
+    private string GetTransform()
+    {
+        var x = 0f;
+        if (GetXDirection() == DrawDirection.Inverted)
+        {
+            x = Area.Size.X;
+        }
+        var y = 0f;
+        if (GetYDirection() == DrawDirection.Inverted)
+        {
+            y = Area.Size.Y;
+        }
+        if (x == 0 && y == 0)
+        {
+            return null;
+        }
+        return $"translate({x}, {y})";
+    }
+
+}
