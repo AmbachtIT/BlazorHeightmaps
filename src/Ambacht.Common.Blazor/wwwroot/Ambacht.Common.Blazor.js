@@ -26,6 +26,11 @@
 
         getBounds: function (el) {
             return el.getBoundingClientRect();
+        },
+
+        getSize: function (element) {
+          var rect = element.getBoundingClientRect();
+          return [rect.width, rect.height];
         }
     };
 

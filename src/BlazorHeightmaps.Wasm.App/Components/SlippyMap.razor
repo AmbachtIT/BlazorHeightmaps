@@ -1,0 +1,180 @@
+﻿@inject IJSRuntime JsRuntime
+
+<div @ref="_container" class="map-container"
+     @onmousedown="OnMouseDown"
+     @onmousemove="OnMouseMove"
+     @onmouseup="OnMouseUp"
+     @onmouseout="OnMouseOut"
+     @onmousewheel="OnMouseWheel">
+  <CascadingValue Value="_view">
+    @foreach (var tile in _visibleTiles)
+    {
+	    <img class="tile"
+           @key="tile.Key"
+           src="@tile.Image" 
+           style="@tile.Style" />
+    }
+
+    @ChildContent
+  </CascadingValue>
+</div>
+
+<style>
+  div.map-container {
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+    margin: 0px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+  }
+
+  img.tile {
+    position: absolute;
+    user-select: none;
+    pointer-events: none;
+    touch-action: none;
+  }
+</style>
+
+@code {
+
+  [Parameter()]
+  public float Latitude { get; set; }
+
+  [Parameter()]
+  public float Longitude { get; set; }
+
+  [Parameter()]
+  public int ZoomLevel { get; set; }
+
+  [Parameter()]
+  public EventCallback<SlippyMapView> OnViewChanged { get; set; }
+
+  [Parameter()]
+  public RenderFragment ChildContent { get; set; }
+
+  [Parameter()]
+  public string Class { get; set; }
+
+  /// <summary>
+  /// Reference to the div container, used to retrieve the size
+  /// </summary>
+  private ElementReference _container;
+
+  private SlippyMapView _view = new SlippyMapView();
+  private List<SlippyTileViewModel> _visibleTiles = new();
+  private readonly SlippyTileSet _set = SlippyTileSet.OpenStreetMap;
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (firstRender)
+    {
+      var sizes = await JsRuntime.InvokeAsync<int[]>("Ambacht.getSize", _container);
+	    var size = new Vector2(sizes[0], sizes[1]);
+      Console.WriteLine($"Size: {size}");
+      await SetView(new SlippyMapView()
+	          {
+		            Coords = new(Latitude, Longitude),
+		            Zoom = ZoomLevel,
+		            Size = size,
+		            TileSize = _set.TileSize
+	          });
+    }
+  }
+
+
+  private async Task SetView(SlippyMapView newView)
+  {
+    _view = newView;
+    _visibleTiles = _set.GetVisibleTiles(_view).ToList();
+    this.StateHasChanged();
+    await OnViewChanged.InvokeAsync(_view);
+  }
+
+  #region panning state
+
+  /// <summary>Pans the map</summary>
+  /// <remarks>Delta are in component pixel space, which has the same scale as tile pixel space</remarks>
+  public async Task Pan(Vector2 delta)
+  {
+      var pos = SlippyMath.LatLngToPixel(_view.Coords, _view.ZoomLevel, _set.TileSize) - delta;
+      await SetView(_view with
+      {
+          Coords = SlippyMath.PixelToLatLng(pos, _view.ZoomLevel, _set.TileSize)
+      });
+  }
+
+    private bool _dragging = false;
+    private Vector2 _previous;
+
+    private void OnMouseDown(MouseEventArgs args)
+    {
+      if (args.Button == 0)
+      {
+        _dragging = true;
+      _previous = new Vector2((float)args.ClientX, (float)args.ClientY);
+      }
+    }
+
+    private void OnMouseUp(MouseEventArgs args)
+    {
+      if (args.Button == 0)
+      {
+        _dragging = false;
+      }
+    }
+
+    private async Task OnMouseMove(MouseEventArgs args)
+    {
+      if (args.Button == 0)
+      {
+        if (_dragging)
+        {
+        var current = new Vector2((float)args.ClientX, (float)args.ClientY);
+          var delta = current - _previous;
+          _previous = current;
+          await Pan(delta);
+        }
+      }
+    }
+
+    private void OnMouseOut(MouseEventArgs args)
+    {
+      _dragging = false;
+    }
+
+    private readonly Debounce debounceMouseMove = new Debounce(TimeSpan.FromMilliseconds(25));
+
+    #endregion
+
+    #region Scrolling
+
+    public async Task Zoom(int deltaLevels, Vector2 pos)
+    {
+    var newZoomLevel = Math.Clamp(_view.ZoomLevel + deltaLevels, _set.MinZoom, _set.MaxZoom);
+    var center = SlippyMath.LatLngToPixel(_view.Coords, _view.ZoomLevel, _set.TileSize);
+      center -= _view.HalfSize;
+      center += pos;
+	    await SetView(_view with {
+		    Coords = SlippyMath.PixelToLatLng(center, _view.ZoomLevel, _set.TileSize),
+		    Zoom = newZoomLevel
+		    });
+    }
+
+
+    double _amountLeft = 0;
+    double _amountPerLevel = 100;
+
+    private async Task OnMouseWheel(WheelEventArgs args)
+    {
+      _amountLeft -= args.DeltaY;
+      var levels = (int)(_amountLeft / _amountPerLevel);
+      _amountLeft -= levels * _amountPerLevel;
+      var current = new Vector2((float)args.ClientX, (float)args.ClientY);
+      await Zoom(levels, current);
+    }
+
+    #endregion
+
+}
