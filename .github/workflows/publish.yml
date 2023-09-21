@@ -39,7 +39,7 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Publish
-      run: dotnet publish --configuration Release --no-build
+      run: dotnet publish src/BlazorHeightmaps.Wasm.App/BlazorHeightmaps.Wasm.App.csproj --configuration Release --no-build
     - name: Setup Pages
       uses: actions/configure-pages@v3
     - name: Upload artifact
