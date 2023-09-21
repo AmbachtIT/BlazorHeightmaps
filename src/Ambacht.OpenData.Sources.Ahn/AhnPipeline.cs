@@ -166,10 +166,10 @@ namespace Ambacht.OpenData.Sources.Ahn
                 var url = set.GetDownloadLink(sheet);
                 var stream = await GetStream(client, url);
                 var filename = url.Split('/').Last();
-                return new TiffHeightmapReader()
+                return await new TiledTiffHeightmapReader()
                 {
                     FlipY = true
-                }.FromStream(filename, stream);
+                }.Load(filename, stream);
             }
         }
 

@@ -8,6 +8,7 @@ using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Xsl;
+using Ambacht.Common.Mathmatics;
 using Ambacht.Common.UX;
 using ICSharpCode.SharpZipLib.GZip;
 using Rectangle = Ambacht.Common.Mathmatics.Rectangle;
@@ -141,8 +142,22 @@ namespace Ambacht.Common.Maps.Heightmaps
         public const uint Magic = 0x7a6b5c4e;
         public const uint Version = 0x01;
 
-        public void CopyTo(Heightmap target, int tx, int ty)
+
+        public void CopyTo(Heightmap target)
         {
+	        if (Crs != target.Crs)
+	        {
+		        throw new InvalidOperationException("This only works if source and target CRS are the same");
+	        }
+	        var alpha = MathUtil.ReverseLerp(target.Bounds.TopLeft(), target.Bounds.BottomRight(), Bounds.TopLeft());
+	        var sx = (int)(alpha.X * target.Width);
+			var sy = (int)(alpha.Y * target.Height);
+            CopyTo(target, sx, sy);
+        }
+
+		public void CopyTo(Heightmap target, int tx, int ty)
+        {
+            // TODO: Use Span<T> to speed this up
             for (var y = 0; y < Height; y++)
             {
                 for (var x = 0; x < Width; x++)
@@ -165,7 +180,68 @@ namespace Ambacht.Common.Maps.Heightmaps
 
         public IEnumerable<float> ValidHeights() => this.Where(v => !float.IsNaN(v));
 
+        /// <summary>
+        /// Creates a new heightmap that contains all the provided heightmaps. They need to have the same CRS and specified bounds for this to work
+        /// </summary>
+        /// <param name="heightmaps"></param>
+        /// <returns></returns>
+        public static Heightmap Stitch(IEnumerable<Heightmap> heightmaps)
+        {
+	        var list = heightmaps.ToList();
 
-        
+	        var bounds = Rectangle.Cover(list.Select(l => l.Bounds));
+	        if (!bounds.HasArea)
+	        {
+		        throw new InvalidOperationException("Heightmaps need to have non-empty bounds for this to work");
+	        }
+
+	        var crs = list.Select(h => h.Crs).Distinct().Single();
+	        var scaleX = list.Select(h => h.Bounds.Width / h.Width).Distinct().Single();
+	        var scaleY = list.Select(h => h.Bounds.Height / h.Height).Distinct().Single();
+
+	        if (scaleY <= 0 || scaleX <= 0)
+	        {
+		        throw new InvalidOperationException("Invalid scale");
+	        }
+
+	        var result = new Heightmap((int) (bounds.Width / scaleX), (int) (bounds.Height / scaleY))
+	        {
+                Bounds = bounds,
+                Crs = crs
+	        };
+
+	        foreach (var heightmap in list)
+	        {
+                heightmap.CopyTo(result);
+	        }
+
+	        return result;
+        }
+
+        /// <summary>
+        /// Cuts a pixel-perfect slice of this heightmap, starting at the specified position. The heightmap must have bounds for this to work
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        public Heightmap GetPixelArea(Vector2 pos, int width, int height)
+        {
+	        if (!Bounds.HasArea)
+	        {
+		        throw new InvalidOperationException();
+	        }
+
+	        var result = new Heightmap(width, height)
+	        {
+                Crs = Crs,
+                Bounds = new Rectangle(pos.X, pos.Y, width * Bounds.Width / Width, height * Bounds.Height / Height)
+			};
+	        var alpha = MathUtil.ReverseLerp(Bounds.TopLeft(), Bounds.BottomRight(), pos);
+	        var sx = (int)(alpha.X * Width);
+	        var sy = (int)(alpha.Y * Height);
+	        result.CopyFrom(this, sx, sy);
+	        return result;
+        }
     }
 }

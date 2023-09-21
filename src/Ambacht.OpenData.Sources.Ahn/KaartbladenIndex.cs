@@ -26,8 +26,8 @@ namespace Ambacht.OpenData.Sources.Ahn
             }
         }
 
-        public const int BladWidth = 5000;
-        public const int BladHeight = 6250;
+        public const int BladWidthMeters = 5000;
+        public const int BladHeightMeters = 6250;
         public const int TileSizePx = 500;
 
         private Dictionary<(int, int), Kaartblad> _bladenByCoords = new();
@@ -56,7 +56,7 @@ namespace Ambacht.OpenData.Sources.Ahn
 
         private (int, int) GetKey(float x, float y)
         {
-            return ((int)(x / BladWidth), (int)(y / BladHeight));
+            return ((int)(x / BladWidthMeters), (int)(y / BladHeightMeters));
         }
 
         public AhnTile GetTile(AhnRasterDataset set, Vector2 rd)

@@ -4,47 +4,73 @@ using Ambacht.Common.IO;
 using Ambacht.Common.Maps;
 using Ambacht.Common.Maps.Heightmaps;
 using Ambacht.Common.Maps.Projections;
+using Ambacht.Common.Maps.Tiles;
 using Ambacht.Common.Mathmatics;
-using Ambacht.OpenData.Sources.Ahn;
+using ICSharpCode.SharpZipLib.Zip;
 
 namespace BlazorHeightmaps
 {
 	public class HeightmapGenerator
 	{
-		public HeightmapGenerator(IFileSystem files, IHttpClientFactory httpClientFactory)
+
+		public HeightmapGenerator(IHttpClientFactory httpClientFactory)
 		{
-			_files = files;
 			_httpClientFactory = httpClientFactory;
 		}
 
-		private readonly IFileSystem _files;
 		private readonly IHttpClientFactory _httpClientFactory;
 
-		/// <summary>
-		/// Used to report progress
-		/// </summary>
-		public Progress? Progress { get; set; }
 
-
-		public async Task<Heightmap> Run(HeightmapSpecification specification)
+		public async Task<Heightmap> Run(HeightmapSpecification specification, HeightmapSource source)
 		{
-			var ahn = new AhnPipeline(_files, _httpClientFactory);
-
 			// Convert lat/lng to coordinates local to the data set
 			var local = GetLocalCoordinates(specification.Center);
 			var size = specification.PixelSize * GetUnitsPerPixel() / 2;
 			var bounds = new Rectangle(local.X - size.X / 2, local.Y - size.Y / 2, size.X, size.Y);
 
-			var dataset = AhnRasterDataset.Ahn4_Dsm_0_5m;
+			var heightmaps = new List<Heightmap>();
+			foreach (var tile in source.TileSet.GetTiles(bounds))
+			{
+				var heightmap = await DownloadHeightmap(tile, source.HeightmapReader);
+				heightmap.Crs = tile.Crs;
+				heightmap.Bounds = tile.Bounds;
+				heightmaps.Add(heightmap);
+			}
 
-			var stitched = await ahn.StitchTiles(dataset, bounds.Corners().ToArray());
+			var stitched = Heightmap.Stitch(heightmaps);
 
-			var result = new Heightmap((int) specification.PixelSize.X, (int) specification.PixelSize.Y);
-			var alpha = MathUtil.ReverseLerp(stitched.Bounds.TopLeft(), stitched.Bounds.BottomRight(), bounds.TopLeft());
-			var sx = (int)(alpha.X * stitched.Width);
-			var sy = (int)(alpha.Y * stitched.Height);
-			result.CopyFrom(stitched, sx, sy);
-			return result;
+			return stitched.GetPixelArea(bounds.TopLeft(), (int) specification.PixelSize.X,
+				(int) specification.PixelSize.Y);
+		}
+
+
+		private async Task<Heightmap> DownloadHeightmap(IMapTile tile, IHeightmapReader reader)
+		{
+			using (var client = _httpClientFactory.CreateClient())
+			{
+				var url = tile.Url;
+				var stream = await GetStream(client, url);
+				var filename = url.Split('/').Last();
+				return await reader.Load(filename, stream);
+			}
+		}
+
+
+		private async Task<Stream> GetStream(HttpClient client, string url)
+		{
+			var stream = await client.GetStreamAsync(url);
+			if (url.EndsWith("zip"))
+			{
+				var ms = new MemoryStream();
+				await stream.CopyToAsync(ms);
+				ms.Seek(0, SeekOrigin.Begin);
+
+				var zip = new ZipFile(ms);
+				return zip.GetInputStream(0);
+			}
+
+
+			return stream;
 		}
 
 

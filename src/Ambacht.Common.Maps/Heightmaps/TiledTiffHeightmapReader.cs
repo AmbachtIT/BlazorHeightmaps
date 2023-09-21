@@ -13,13 +13,13 @@ using SixLabors.ImageSharp.Formats.Tiff;
 
 namespace Ambacht.Common.Maps.Heightmaps
 {
-    public class TiffHeightmapReader
+    public class TiledTiffHeightmapReader : IHeightmapReader
     {
         public bool FlipY { get; set; }
 
 
 
-        public Heightmap FromStream(string filename, Stream stream)
+        public Task<Heightmap> Load(string filename, Stream stream, CancellationToken token = default)
         {
 			using Tiff image = TiffUtil.OpenRead(filename, stream);
 
@@ -70,15 +70,15 @@ namespace Ambacht.Common.Maps.Heightmaps
 				}
 			}
 
-			return result;
+			return Task.FromResult(result);
 		}
 
-        public async Task<Heightmap> FromFile(string path)
+        public async Task<Heightmap> Load(string path, CancellationToken token = default)
         {
 	        await using (var stream = File.OpenRead(path))
 	        {
 				var filename = new FileInfo(path).Name;
-				return FromStream(filename, stream);
+				return await Load(filename, stream, token);
 	        }
         }
 

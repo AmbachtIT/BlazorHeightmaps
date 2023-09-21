@@ -8,15 +8,15 @@ using Rectangle = Ambacht.Common.Mathmatics.Rectangle;
 
 namespace Ambacht.Common.Maps.Tiles
 {
-	public class AreaTile
+	public interface IMapTile
 	{
-		public string Key { get; set; }
+		string Key { get; }
 
-		public string Url { get; set; }
+		string Url { get; }
 
-		public string Crs { get; set; }
+		string Crs { get; }
 
-		public Rectangle Rectangle { get; set; }
+		Rectangle Bounds { get; }
 
 	}
 }
