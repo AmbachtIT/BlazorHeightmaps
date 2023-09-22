@@ -25,6 +25,9 @@ namespace BlazorHeightmaps
 		/// </summary>
 		public Vector2 PixelSize { get; set; }
 
-
+		/// <summary>
+		/// Larger numbers means a larger area is covered by the heightmap because more more source pixels fit in a target pixel
+		/// </summary>
+		public float Scale { get; set; } = 1;
 	}
 }

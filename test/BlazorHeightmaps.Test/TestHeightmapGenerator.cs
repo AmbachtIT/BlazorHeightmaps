@@ -2,6 +2,7 @@ using System.Numerics;
 using Ambacht.Common.IO;
 using Ambacht.Common.Maps;
 using Ambacht.Common.Maps.Heightmaps;
+using Ambacht.Common.Maps.Tiles;
 using Ambacht.OpenData.Sources.Ahn;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,18 +13,38 @@ namespace BlazorHeightmaps.Test
 	{
 
 		[Test(), Explicit("Downloads large files")]
-		public async Task TestGenerator()
+		public async Task BaseCase()
+		{
+			var spec = new HeightmapSpecification()
+			{
+				Center = new LatLng(52.0833f, 5.0739f),
+				PixelSize = new Vector2(1081, 1081)
+			};
+			await Test(spec, "cities-skylines-utrecht.png");
+		}
+
+
+		[Test(), Explicit("Downloads large files")]
+		public async Task Scale25()
+		{
+			var spec = new HeightmapSpecification()
+			{
+				Center = new LatLng(52.0833f, 5.0739f),
+				PixelSize = new Vector2(1081, 1081),
+				Scale = 25
+			};
+			await Test(spec, "cities-skylines-utrecht-25.png");
+		}
+
+
+
+		private async Task Test(HeightmapSpecification spec, string filename)
 		{
 			using (var provider = TestHelper.CreateServiceProvider())
 			{
-				var system = new InMemoryFileSystem();
 				var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
-				var generator = new HeightmapGenerator(httpClientFactory);
-				var spec = new HeightmapSpecification()
-				{
-					Center = new LatLng(52.0833f, 5.0739f),
-					PixelSize = new Vector2(1081, 1081)
-				};
+				using var httpClient = new HttpClient();
+				var generator = new HeightmapGenerator();
 
 				var source = new HeightmapSource()
 				{
@@ -31,7 +52,11 @@ namespace BlazorHeightmaps.Test
 					{
 						FlipY = true
 					},
-					TileSet = new AhnSheetMapTileSet(AhnRasterDataset.Ahn4_Dsm_0_5m) 
+					TileSet = new AhnSheetMapTileSet(AhnRasterDataset.Ahn4_Dsm_0_5m),
+					StreamSource = new CachingTileStreamSource(
+						new HttpMapTileStreamSource(httpClient),
+						new LocalFileSystem(TestHelper.GetSourceRoot(".cache", "ahn4"))
+					)
 				};
 
 				var heightmap = await generator.Run(spec, source);
@@ -42,9 +67,15 @@ namespace BlazorHeightmaps.Test
 				{
 					FlipY = true
 				};
-				await heightmap.SaveImage(TestHelper.GetSourceRoot("test", "BlazorHeightmaps.Test", "data", "cities-skylines-utrecht.png"), render);
+				using (var stream = File.Create(TestHelper.GetSourceRoot("test", "BlazorHeightmaps.Test", "data",
+					       filename.Replace(".png", ".hmz"))))
+				{
+					heightmap.Save(stream);
+				}
+				await heightmap.SaveImage(TestHelper.GetSourceRoot("test", "BlazorHeightmaps.Test", "data", filename), render);
 			}
 		}
+
 	}
 
 }

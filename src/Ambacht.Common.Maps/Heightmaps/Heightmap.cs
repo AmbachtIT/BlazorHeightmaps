@@ -97,16 +97,34 @@ namespace Ambacht.Common.Maps.Heightmaps
                 for (var nx = 0; nx < result.Width; nx++)
                 {
                     var sum = 0f;
+                    var count = 0;
                     for (var sy = 0; sy < factor; sy++)
                     {
                         for (var sx = 0; sx < factor; sx++)
                         {
-                            sum += this[nx * factor + sx, ny * factor + sy];
-                        }
+	                        var px = nx * factor + sx;
+	                        var py = ny * factor + sy;
+	                        if (px < Width && py < Height)
+	                        {
+		                        var value = this[px, py];
+		                        if (!float.IsNaN(value))
+		                        {
+			                        sum += value;
+			                        count++;
+		                        }
+							}
+						}
                     }
 
-                    result[nx, ny] = sum / (factor * factor);
-                }
+                    if (count > 0)
+                    {
+	                    result[nx, ny] = sum / count;
+                    }
+                    else
+                    {
+                        result[nx, ny] = float.NaN;
+                    }
+				}
             }
 
             return result;

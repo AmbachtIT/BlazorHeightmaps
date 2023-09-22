@@ -13,25 +13,20 @@ namespace BlazorHeightmaps
 	public class HeightmapGenerator
 	{
 
-		public HeightmapGenerator(IHttpClientFactory httpClientFactory)
-		{
-			_httpClientFactory = httpClientFactory;
-		}
-
-		private readonly IHttpClientFactory _httpClientFactory;
-
-
 		public async Task<Heightmap> Run(HeightmapSpecification specification, HeightmapSource source)
 		{
 			// Convert lat/lng to coordinates local to the data set
 			var local = GetLocalCoordinates(specification.Center);
-			var size = specification.PixelSize * GetUnitsPerPixel() / 2;
+			var size = specification.PixelSize * specification.Scale * GetUnitsPerPixel();
 			var bounds = new Rectangle(local.X - size.X / 2, local.Y - size.Y / 2, size.X, size.Y);
 
 			var heightmaps = new List<Heightmap>();
 			foreach (var tile in source.TileSet.GetTiles(bounds))
 			{
-				var heightmap = await DownloadHeightmap(tile, source.HeightmapReader);
+				var heightmap = await FetchHeightmap(tile, source.StreamSource, source.HeightmapReader);
+
+				heightmap = heightmap.Downsample((int) specification.Scale);
+
 				heightmap.Crs = tile.Crs;
 				heightmap.Bounds = tile.Bounds;
 				heightmaps.Add(heightmap);
@@ -44,40 +39,23 @@ namespace BlazorHeightmaps
 		}
 
 
-		private async Task<Heightmap> DownloadHeightmap(IMapTile tile, IHeightmapReader reader)
+		private async Task<Heightmap> FetchHeightmap(IMapTile tile, IMapTileStreamSource source, IHeightmapReader reader)
 		{
-			using (var client = _httpClientFactory.CreateClient())
-			{
-				var url = tile.Url;
-				var stream = await GetStream(client, url);
-				var filename = url.Split('/').Last();
-				return await reader.Load(filename, stream);
-			}
+			var url = tile.Url;
+			await using var stream = await source.GetStream(tile);
+			await using var wrapped = await stream.WrapWithDecompression(url.Split('/').Last());
+			var filename = url.Split('/').Last();
+			return await reader.Load(filename, wrapped);
 		}
 
 
-		private async Task<Stream> GetStream(HttpClient client, string url)
-		{
-			var stream = await client.GetStreamAsync(url);
-			if (url.EndsWith("zip"))
-			{
-				var ms = new MemoryStream();
-				await stream.CopyToAsync(ms);
-				ms.Seek(0, SeekOrigin.Begin);
 
-				var zip = new ZipFile(ms);
-				return zip.GetInputStream(0);
-			}
-
-
-			return stream;
-		}
 
 
 
 		private Vector2 GetLocalCoordinates(LatLng coords) => new RijksDriehoeksProjection().Project(coords);
 
-		private float GetUnitsPerPixel() => 5;
+		private float GetUnitsPerPixel() => 0.5f;
 
 
 

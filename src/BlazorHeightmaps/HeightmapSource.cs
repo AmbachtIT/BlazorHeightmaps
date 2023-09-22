@@ -15,5 +15,7 @@ namespace BlazorHeightmaps
 
 		public IHeightmapReader HeightmapReader { get; set; }
 
+		public IMapTileStreamSource StreamSource { get; set; }
+
 	}
 }
