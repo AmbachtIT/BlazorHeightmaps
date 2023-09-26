@@ -11,11 +11,8 @@ namespace BlazorHeightmaps
 	public class HeightmapSource
 	{
 
-		public IMapTileSet TileSet { get; set; }
+		public IHeightmapDataProvider DataProvider { get; set; }
 
-		public IHeightmapReader HeightmapReader { get; set; }
-
-		public IMapTileStreamSource StreamSource { get; set; }
 
 	}
 }

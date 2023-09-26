@@ -43,20 +43,12 @@ namespace BlazorHeightmaps.Test
 			using (var provider = TestHelper.CreateServiceProvider())
 			{
 				var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
-				using var httpClient = new HttpClient();
+				using var httpClient = httpClientFactory.CreateClient();
 				var generator = new HeightmapGenerator();
 
 				var source = new HeightmapSource()
 				{
-					HeightmapReader = new TiledTiffHeightmapReader()
-					{
-						FlipY = true
-					},
-					TileSet = new AhnSheetMapTileSet(AhnRasterDataset.Ahn4_Dsm_0_5m),
-					StreamSource = new CachingTileStreamSource(
-						new HttpMapTileStreamSource(httpClient),
-						new LocalFileSystem(TestHelper.GetSourceRoot(".cache", "ahn4"))
-					)
+					DataProvider = CreateAhnStitchingProvider(httpClient)
 				};
 
 				var heightmap = await generator.Run(spec, source);
@@ -74,6 +66,21 @@ namespace BlazorHeightmaps.Test
 				}
 				await heightmap.SaveImage(TestHelper.GetSourceRoot("test", "BlazorHeightmaps.Test", "data", filename), render);
 			}
+		}
+
+
+		private IHeightmapDataProvider CreateAhnStitchingProvider(HttpClient client)
+		{
+			return new StitchingHeightmapDataProvider(
+				new AhnSheetMapTileSet(AhnRasterDataset.Ahn4_Dsm_0_5m),
+				new TiledTiffHeightmapReader()
+				{
+					FlipY = true
+				},
+				new CachingTileStreamSource(
+					new HttpMapTileStreamSource(client),
+					new LocalFileSystem(TestHelper.GetSourceRoot(".cache", "ahn4"))
+				));
 		}
 
 	}
