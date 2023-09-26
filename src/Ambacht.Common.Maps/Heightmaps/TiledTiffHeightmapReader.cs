@@ -82,5 +82,6 @@ namespace Ambacht.Common.Maps.Heightmaps
 	        }
         }
 
+        public override string ToString() => "tiled-tiff";
     }
 }

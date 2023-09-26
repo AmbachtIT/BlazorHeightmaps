@@ -29,6 +29,9 @@ namespace Ambacht.Common.Maps.Tiles
 		{
 			return await _httpClient.GetStreamAsync(tile.Url);
 		}
+
+
+		public override string ToString() => "http";
 	}
 
 	public class CachingTileStreamSource : IMapTileStreamSource
@@ -57,6 +60,8 @@ namespace Ambacht.Common.Maps.Tiles
 			return await _store.OpenRead(path);
 		}
 
+
+		public override string ToString() => $"caching({_source})";
 	}
 
 }

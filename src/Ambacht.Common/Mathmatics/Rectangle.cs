@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Ambacht.Common.Mathmatics
 {
-    public record struct Rectangle
+    public record struct Rectangle : IFormattable
     {
 
         public Rectangle(float left, float top, float width, float height)
@@ -211,5 +212,71 @@ namespace Ambacht.Common.Mathmatics
         }
 
         #endregion
+
+        public string ToString(string format, IFormatProvider formatProvider)
+        {
+	        if (string.IsNullOrEmpty(format))
+	        {
+		        return base.ToString();
+	        }
+
+            var builder = new StringBuilder();
+            foreach (var c in format)
+            {
+	            builder.Append(c switch
+	            {
+		            'l' or 'L' => Left.ToString(null, formatProvider),
+		            'r' or 'R' => Right.ToString(null, formatProvider),
+		            't' or 'T' => Top.ToString(null, formatProvider),
+		            'b' or 'B' => Bottom.ToString(null, formatProvider),
+		            'w' or 'W' => Width.ToString(null, formatProvider),
+		            'h' or 'H' => Height.ToString(null, formatProvider),
+		            _ => c.ToString()
+	            });
+            } 
+            return builder.ToString();
+        }
+
+        public string ToString(string format) => ToString(format, CultureInfo.InvariantCulture);
+
+		public override string ToString() => ToString("(L, T)-(R, B)");
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="size"></param>
+        /// <returns></returns>
+		public Rectangle ExpandToMatchRatio(Vector2 size)
+        {
+	        var scaleX = Width / size.X;
+            var scaleY = Height / size.Y;
+            var scale = Math.Min(scaleX, scaleY);
+
+            var newSize = size * scale;
+            return Around(Center(), newSize);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        public Rectangle ShrinkToMatchRatio(Vector2 size)
+        {
+	        var scaleX = Width / size.X;
+	        var scaleY = Height / size.Y;
+	        var scale = Math.Max(scaleX, scaleY);
+
+	        var newSize = size * scale;
+	        return Around(Center(), newSize);
+        }
+
+
+
+		public static Rectangle Around(Vector2 center, Vector2 size)
+        {
+	        var half = size / 2;
+	        return new Rectangle(center.X - half.X, center.Y - half.Y, size.X, size.Y);
+        }
     }
 }

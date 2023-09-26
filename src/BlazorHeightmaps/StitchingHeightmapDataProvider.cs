@@ -26,20 +26,25 @@ namespace BlazorHeightmaps
 		private readonly IMapTileSet _tileSet;
 		private readonly IHeightmapReader _reader;
 		private readonly IMapTileStreamSource _source;
+		private readonly Projection _projection = new RijksDriehoeksProjection();
 
 
-		public async Task<Heightmap> GetHeightmap(LatLng center, Vector2 pixelSize, float scale)
+		public async Task<Heightmap> GetHeightmap(LatLngBounds latLngBounds, Vector2 pixelSize)
 		{
-			var local = GetLocalCoordinates(center);
-			var size = pixelSize * scale * GetUnitsPerPixel();
-			var bounds = new Rectangle(local.X - size.X / 2, local.Y - size.Y / 2, size.X, size.Y);
+			var bounds = _projection.Project(latLngBounds).ExpandToMatchRatio(pixelSize);
+
+			var desiredMetersPerPixel = bounds.Width / pixelSize.X;
 
 			var heightmaps = new List<Heightmap>();
-			foreach (var tile in _tileSet.GetTiles(bounds))
+			var tiles = _tileSet.GetTiles(bounds).ToList();
+			foreach (var tile in tiles)
 			{
 				var heightmap = await FetchHeightmap(tile);
 
-				heightmap = heightmap.Downsample((int)scale);
+				var actualMetersPerPixel = heightmap.UnitsPerPixel.X;
+				var scale = (int)Math.Round(desiredMetersPerPixel / actualMetersPerPixel);
+
+				heightmap = heightmap.Downsample(scale);
 
 				heightmap.Crs = tile.Crs;
 				heightmap.Bounds = tile.Bounds;
@@ -58,11 +63,17 @@ namespace BlazorHeightmaps
 			await using var stream = await _source.GetStream(tile);
 			await using var wrapped = await stream.WrapWithDecompression(url.Split('/').Last());
 			var filename = url.Split('/').Last();
-			return await _reader.Load(filename, wrapped);
+			var result = await _reader.Load(filename, wrapped);
+			result.Bounds = tile.Bounds;
+			return result;
 		}
 
 		private Vector2 GetLocalCoordinates(LatLng coords) => new RijksDriehoeksProjection().Project(coords);
 
 		private float GetUnitsPerPixel() => 0.5f;
+
+
+		public override string ToString() => $"stitching({_tileSet}, {_reader}, {_source})";
+
 	}
 }

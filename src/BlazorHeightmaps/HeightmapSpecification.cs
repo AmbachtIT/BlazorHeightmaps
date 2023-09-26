@@ -16,18 +16,15 @@ namespace BlazorHeightmaps
 	{
 
 		/// <summary>
-		/// Center of the height map
+		/// Lat/lng bounds of the height map. If the aspect ratio of these bounds is not equal to the desired pixel size,
+		/// the bounds should be shrunk so they match the desired pixel size.
 		/// </summary>
-		public LatLng Center { get; set; }
+		public LatLngBounds Bounds { get; set; }
 
 		/// <summary>
 		/// desired pixel size
 		/// </summary>
 		public Vector2 PixelSize { get; set; }
 
-		/// <summary>
-		/// Larger numbers means a larger area is covered by the heightmap because more more source pixels fit in a target pixel
-		/// </summary>
-		public float Scale { get; set; } = 1;
 	}
 }

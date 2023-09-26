@@ -16,7 +16,7 @@ namespace BlazorHeightmaps
 		public async Task<Heightmap> Run(HeightmapSpecification specification, HeightmapSource source)
 		{
 			// Convert lat/lng to coordinates local to the data set
-			return await source.DataProvider.GetHeightmap(specification.Center, specification.PixelSize, specification.Scale);
+			return await source.DataProvider.GetHeightmap(specification.Bounds, specification.PixelSize);
 		}
 
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Ambacht.Common.Maps;
 using Ambacht.Common.Maps.Tiles;
 using Rectangle = Ambacht.Common.Mathmatics.Rectangle;
 
@@ -33,7 +34,7 @@ namespace Ambacht.OpenData.Sources.Ahn
 			{
 				Key = sheet.Id,
 				Bounds = new Rectangle(sheet.X, sheet.Y, sheet.Width, sheet.Height),
-				Crs = AhnPipeline.CrsRd,
+				Crs = Crs.RdEpsg,
 				Url = _dataset.GetDownloadLink(sheet.Id)
 			};
 		}
@@ -60,6 +61,9 @@ namespace Ambacht.OpenData.Sources.Ahn
 		public string Url { get; init; }
 		public string Crs { get; init; }
 		public Rectangle Bounds { get; init; }
+
+
+		public override string ToString() => Key;
 	}
 
 }

@@ -7,6 +7,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using Ambacht.Common.IO;
+using Ambacht.Common.Maps;
 using Ambacht.Common.Maps.Heightmaps;
 using Ambacht.Common.Maps.Tiles;
 using ICSharpCode.SharpZipLib.Zip;
@@ -54,7 +55,7 @@ namespace Ambacht.OpenData.Sources.Ahn
                 (int) (totalBounds.Width / set.MetersPerPixel),
                 (int) (totalBounds.Height / set.MetersPerPixel))
             {
-                Crs = CrsRd,
+                Crs = Crs.RdEpsg,
                 Bounds = totalBounds
             };
 
@@ -126,7 +127,7 @@ namespace Ambacht.OpenData.Sources.Ahn
                 await _semaphore.WaitAsync();
 
                 var source = await DownloadHeightmap(set, sheet);
-                source.Crs = CrsRd;
+                source.Crs = Crs.RdEpsg;
                 source.Bounds = new Rectangle(blad.X, blad.Y, blad.Width, blad.Height);
 
                 await new HeightmapTiler(_files)
@@ -206,7 +207,6 @@ namespace Ambacht.OpenData.Sources.Ahn
         };
 
 
-        public const string CrsRd = "EPSG:28992";
     }
 
 

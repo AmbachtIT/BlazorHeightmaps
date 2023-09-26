@@ -84,13 +84,15 @@ namespace Ambacht.Common.Maps.Heightmaps
         }
 
 
-        public Heightmap Downsample(int factor)
-        {
-            if (Width % factor != 0 || Height % factor != 0)
-            {
-                throw new ArgumentException("Downsample factor should be a multiple of both height and width");
-            }
 
+        public bool IsAcceptableDownscaleFactor(int factor)
+        {
+	        return Width % factor == 0 && Height % factor == 0;
+
+        }
+
+		public Heightmap Downsample(int factor)
+        {
             var result = new Heightmap(Width / factor, Height / factor);
             for (var ny = 0; ny < result.Height; ny++)
             {
@@ -161,6 +163,12 @@ namespace Ambacht.Common.Maps.Heightmaps
         public const uint Version = 0x01;
 
 
+        public bool Contains(int x, int y)
+        {
+	        return x >= 0 && x < Width
+	                      && y >= 0 && y < Height;
+        }
+
         public void CopyTo(Heightmap target)
         {
 	        if (Crs != target.Crs)
@@ -180,8 +188,11 @@ namespace Ambacht.Common.Maps.Heightmaps
             {
                 for (var x = 0; x < Width; x++)
                 {
-                    target[tx + x, ty + y] = this[x, y];
-                }
+	                if (target.Contains(tx + x, ty + y))
+	                {
+		                target[tx + x, ty + y] = this[x, y];
+	                }
+				}
             }
         }
 
@@ -191,8 +202,11 @@ namespace Ambacht.Common.Maps.Heightmaps
             {
                 for (var x = 0; x < Width; x++)
                 {
-                    this[x, y] = source[sx + x, sy + y];
-                }
+	                if (source.Contains(sx + x, sy + y))
+	                {
+		                this[x, y] = source[sx + x, sy + y];
+	                }
+				}
             }
         }
 
@@ -261,5 +275,10 @@ namespace Ambacht.Common.Maps.Heightmaps
 	        result.CopyFrom(this, sx, sy);
 	        return result;
         }
+
+
+        public Vector2 UnitsPerPixel => new(Bounds.Width / Width, Bounds.Height / Height);
+
+
     }
 }

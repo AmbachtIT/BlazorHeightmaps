@@ -64,5 +64,11 @@ namespace Ambacht.Common.Maps
         public LatLng Max => max;
 
         public LatLng NorthWest => new LatLng(Max.Latitude, Min.Longitude);
+		public LatLng NorthEast => new LatLng(Max.Latitude, Max.Longitude);
+		public LatLng SouthEast => new LatLng(Min.Latitude, Max.Longitude);
+		public LatLng SouthWest => new LatLng(Min.Latitude, Min.Longitude);
+
+        public LatLng Center() => new LatLng((Min.Latitude + Max.Latitude) / 2, (Min.Longitude + Max.Longitude) / 2);
+
     }
 }
