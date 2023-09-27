@@ -47,7 +47,10 @@ namespace Ambacht.Common.Maps.Tiles
 
 		public async Task<Stream> GetStream(IMapTile tile)
 		{
-			var path = tile.Key;
+			var lowered = tile.Url.ToLowerInvariant();
+			var extension = lowered.Split('.').Last();
+			var path = $"{tile.Key}.{extension}";
+
 			if (!(await _store.Exists(path)))
 			{
 				using (var source = await _source.GetStream(tile))

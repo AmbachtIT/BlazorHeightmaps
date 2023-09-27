@@ -56,6 +56,8 @@ namespace Ambacht.OpenData.Sources.Ahn
 				}
 			}
 		}
+
+		public override string ToString() => _dataset.ToString();
 	}
 
 	public class AhnSheetTile : IMapTile

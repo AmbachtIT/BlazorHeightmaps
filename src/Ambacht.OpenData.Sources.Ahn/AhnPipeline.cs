@@ -201,7 +201,7 @@ namespace Ambacht.OpenData.Sources.Ahn
 
         private string FormatResolution(AhnResolution resolution) => resolution switch
         {
-            AhnResolution.Res_0_5m => "50cm",
+            AhnResolution.Res_50cm => "50cm",
             AhnResolution.Res_5m => "5m",
             _ => throw new NotImplementedException()
         };

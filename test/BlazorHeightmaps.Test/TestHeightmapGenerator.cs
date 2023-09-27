@@ -51,10 +51,10 @@ namespace BlazorHeightmaps.Test
 				FlipY = true,
 
 			};
-			using (var stream = File.Create(Path.Combine(basePath, filename.Replace(".png", ".hmz"))))
+			/*using (var stream = File.Create(Path.Combine(basePath, filename.Replace(".png", ".hmz"))))
 			{
 				heightmap.Save(stream);
-			}
+			}*/
 			await heightmap.SaveImage(Path.Combine(basePath, filename.Replace(".png", "-full-range.png")), render);
 			heightmap.Multiply(2);
 			render = render with
@@ -101,14 +101,33 @@ namespace BlazorHeightmaps.Test
 			{
 				FlipY = true
 			};
-			yield return new StitchingHeightmapDataProvider(
-				new AhnSheetMapTileSet(AhnRasterDataset.Ahn4_Dsm_0_5m),
-				tiff,
-				new CachingTileStreamSource(
-					new HttpMapTileStreamSource(client),
-					new LocalFileSystem(TestHelper.GetSourceRoot(".cache", "ahn4"))
-				));
-			yield return new ArcgisAhnHeightmapDataProvider(tiff, client);
+
+			IHeightmapDataProvider CreateAhnStitching(int version, AhnLayer layer, AhnResolution resolution)
+			{
+				var set = new AhnSheetMapTileSet(AhnRasterDataset.Get(version, layer, resolution));
+				return new StitchingHeightmapDataProvider(
+					set,
+					tiff,
+					new CachingTileStreamSource(
+						new HttpMapTileStreamSource(client),
+						new LocalFileSystem(TestHelper.GetSourceRoot(".cache", set.ToString()))
+					));
+			}
+
+			yield return new ArcgisAhnHeightmapDataProvider(tiff, client)
+			{
+				Layer = AhnLayer.Dtm,
+				Resolution = AhnResolution.Res_50cm
+			};
+			yield return new ArcgisAhnHeightmapDataProvider(tiff, client)
+			{
+				Layer = AhnLayer.Dsm,
+				Resolution = AhnResolution.Res_50cm
+			};
+
+			yield return CreateAhnStitching(4, AhnLayer.Dsm, AhnResolution.Res_50cm);
+			yield return CreateAhnStitching(3, AhnLayer.Dsm, AhnResolution.Res_5m);
+			yield return CreateAhnStitching(3, AhnLayer.Dtm, AhnResolution.Res_5m);
 		}
 
 

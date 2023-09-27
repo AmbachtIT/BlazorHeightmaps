@@ -10,6 +10,7 @@ using Ambacht.Common.Maps.Arcgis;
 using Ambacht.Common.Maps.Heightmaps;
 using Ambacht.Common.Maps.Projections;
 using Ambacht.Common.Mathmatics;
+using Ambacht.OpenData.Sources.Ahn;
 
 namespace BlazorHeightmaps
 {
@@ -29,7 +30,7 @@ namespace BlazorHeightmaps
 		public async Task<Heightmap> GetHeightmap(LatLngBounds bounds, Vector2 pixelSize)
 		{
 			var rdBounds = _rd.Project(bounds).ExpandToMatchRatio(pixelSize);
-			var url = new ArcgisExportImageUrlBuilder("https://ahn.arcgisonline.nl/arcgis/rest/services/AHNviewer/AHN4_DSM_50cm/ImageServer/exportImage")
+			var url = new ArcgisExportImageUrlBuilder($"https://ahn.arcgisonline.nl/arcgis/rest/services/AHNviewer/AHN4_{Layer.ToString().ToUpper()}_{FormattedResolution}/ImageServer/exportImage")
 			{
 				Width = (int)pixelSize.X,
 				Height = (int)pixelSize.Y,
@@ -50,8 +51,24 @@ namespace BlazorHeightmaps
 			}
 		}
 
+		
+
+		public AhnLayer Layer { get; set; } = AhnLayer.Dsm;
+
+		public AhnResolution Resolution { get; set; } = AhnResolution.Res_50cm;
+
+		private string FormattedResolution => Resolution switch
+		{
+			AhnResolution.Res_5m => "5m",
+			AhnResolution.Res_50cm => "50cm",
+			_ => throw new NotSupportedException()
+		};
 
 		private readonly Projection _rd = new RijksDriehoeksProjection();
 
+		public override string ToString()
+		{
+			return $"arcgisonline-{Layer.ToString().ToLower()}-{FormattedResolution}";
+		}
 	}
 }

@@ -44,12 +44,16 @@ namespace Ambacht.OpenData.Sources.Ahn
         public string GetDownloadLink(string kaartblad)
         {
             var prefix = Layer == AhnLayer.Dsm ? "R" : "M";
+            if (Resolution == AhnResolution.Res_5m)
+            {
+	            prefix += "5";
+            }
             var filename = $"{prefix}_{kaartblad}.{Extension}";
             return GetBaseUrl() + filename;
         }
 
 
-        public float MetersPerPixel => Resolution == AhnResolution.Res_0_5m ? 0.5f : 5f;
+        public float MetersPerPixel => Resolution == AhnResolution.Res_50cm ? 0.5f : 5f;
 
 
         protected abstract string GetBaseUrl();
@@ -61,29 +65,56 @@ namespace Ambacht.OpenData.Sources.Ahn
         protected abstract string Extension { get; }
 
 
-        public static readonly AhnRasterDataset Ahn4_Dtm_0_5m = new Ahn4RasterDataset()
+        public static readonly AhnRasterDataset Ahn4_Dtm_50cm = new Ahn4RasterDataset()
         {
             Layer = AhnLayer.Dtm,
-            Resolution = AhnResolution.Res_0_5m,
+            Resolution = AhnResolution.Res_50cm,
         };
-        public static readonly AhnRasterDataset Ahn4_Dsm_0_5m = new Ahn4RasterDataset()
+        public static readonly AhnRasterDataset Ahn4_Dsm_50cm = new Ahn4RasterDataset()
         {
             Layer = AhnLayer.Dsm,
-            Resolution = AhnResolution.Res_0_5m,
+            Resolution = AhnResolution.Res_50cm,
         };
 
-        public static readonly AhnRasterDataset Ahn3_Dtm_0_5m = new Ahn3RasterDataset()
+        public static readonly AhnRasterDataset Ahn3_Dtm_50cm = new Ahn3RasterDataset()
         {
             Layer = AhnLayer.Dtm,
-            Resolution = AhnResolution.Res_0_5m,
+            Resolution = AhnResolution.Res_50cm,
         };
-        public static readonly AhnRasterDataset Ahn3_Dsm_0_5m = new Ahn3RasterDataset()
+        public static readonly AhnRasterDataset Ahn3_Dsm_50cm = new Ahn3RasterDataset()
         {
             Layer = AhnLayer.Dsm,
-            Resolution = AhnResolution.Res_0_5m,
+            Resolution = AhnResolution.Res_50cm,
         };
 
+        public static readonly AhnRasterDataset Ahn3_Dtm_5m = new Ahn3RasterDataset()
+        {
+	        Layer = AhnLayer.Dtm,
+	        Resolution = AhnResolution.Res_5m,
+        };
+        public static readonly AhnRasterDataset Ahn3_Dsm_5m = new Ahn3RasterDataset()
+        {
+	        Layer = AhnLayer.Dsm,
+	        Resolution = AhnResolution.Res_5m,
+        };
 
+		public override string ToString() => $"ahn{Version}-{FormatLayer()}-{FormatResolution()}";
+
+        public static AhnRasterDataset? Get(int version, AhnLayer layer, AhnResolution resolution)
+        {
+	        return (version, layer, resolution) switch
+	        {
+		        (4, AhnLayer.Dtm, AhnResolution.Res_50cm) => Ahn4_Dtm_50cm,
+		        (4, AhnLayer.Dsm, AhnResolution.Res_50cm) => Ahn4_Dsm_50cm,
+
+		        (3, AhnLayer.Dtm, AhnResolution.Res_50cm) => Ahn3_Dtm_50cm,
+		        (3, AhnLayer.Dsm, AhnResolution.Res_50cm) => Ahn3_Dsm_50cm,
+				(3, AhnLayer.Dtm, AhnResolution.Res_5m) => Ahn3_Dtm_5m,
+		        (3, AhnLayer.Dsm, AhnResolution.Res_5m) => Ahn3_Dsm_5m,
+
+                _ => null
+	        };
+        }
     }
 
     public class Ahn3RasterDataset : AhnRasterDataset
@@ -98,14 +129,14 @@ namespace Ambacht.OpenData.Sources.Ahn
 
         protected override string FormatResolution() => Resolution switch
         {
-            AhnResolution.Res_0_5m => "50cm",
+            AhnResolution.Res_50cm => "50cm",
             AhnResolution.Res_5m => "5m",
             _ => throw new NotImplementedException()
         };
 
-    }
+	}
 
-    public class Ahn4RasterDataset : AhnRasterDataset
+	public class Ahn4RasterDataset : AhnRasterDataset
     {
         public override int Version => 4;
 
@@ -115,7 +146,7 @@ namespace Ambacht.OpenData.Sources.Ahn
 
         protected override string FormatResolution() => Resolution switch
         {
-            AhnResolution.Res_0_5m => "05m",
+            AhnResolution.Res_50cm => "05m",
             AhnResolution.Res_5m => "5m",
             _ => throw new NotImplementedException()
         };
@@ -144,7 +175,7 @@ namespace Ambacht.OpenData.Sources.Ahn
 
 
     public enum AhnResolution {
-        Res_0_5m,
+        Res_50cm,
         Res_5m
     }
 
