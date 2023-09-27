@@ -48,32 +48,40 @@ namespace BlazorHeightmaps.Test
 
 			var render = HeightmapRenders.Png16BitGreyscale with
 			{
-				FlipY = true
+				FlipY = true,
+
 			};
 			using (var stream = File.Create(Path.Combine(basePath, filename.Replace(".png", ".hmz"))))
 			{
 				heightmap.Save(stream);
 			}
+			await heightmap.SaveImage(Path.Combine(basePath, filename.Replace(".png", "-full-range.png")), render);
+			heightmap.Multiply(2);
+			render = render with
+			{
+				MinValue = -40,
+				MaxValue = 988,
+			};
 			await heightmap.SaveImage(Path.Combine(basePath, filename), render);
 		}
 
 
-		private LatLngBounds GetUtrechtBounds() => _projection.Invert(Rectangle.Around(new Vector2(133073, 455274), new(10000, 10000)));
+		private LatLngBounds GetUtrechtBounds() => _projection.Invert(Rectangle.Around(new Vector2(135273, 453774), new(17280, 17280)));
 
 		private readonly Projection _projection = new RijksDriehoeksProjection();
 
 		[Test()]
 		public async Task GetUrlFromArcGisAhnDataForUtrecht()
 		{
-			var rd = new Vector2(133073, 455274);
-			var rdw = 10000;
-			var rdh = 10000;
+			var rd = new Vector2(135273, 453774);
+			var rdw = 17280;
+			var rdh = 17280;
 			var bounds = new Rectangle(rd.X - rdw / 2f, rd.Y - rdh / 2f, rdw, rdh);
 
 			var url = new ArcgisExportImageUrlBuilder("https://ahn.arcgisonline.nl/arcgis/rest/services/AHNviewer/AHN4_DSM_50cm/ImageServer/exportImage")
 			{
-				Width = 1600,
-				Height = 900,
+				Width = 1081,
+				Height = 1081,
 				Format = "png",
 				//PixelType = "F32",
 				BoundingBox = bounds,

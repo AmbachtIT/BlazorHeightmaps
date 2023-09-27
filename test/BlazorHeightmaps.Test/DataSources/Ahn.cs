@@ -11,15 +11,7 @@ namespace BlazorHeightmaps.Test.DataSources
 	[TestFixture()]
 	public class Ahn
 	{
-		[Test()]
-		public void TestGenerateWmtsUrl()
-		{
-			var url = new WmtsUrlBuilder()
-				.Ahn4Ellipsis()
-				.Ahn4Dsm5(10000, 10000)
-				.Build();
 
-		}
 
 	}
 }

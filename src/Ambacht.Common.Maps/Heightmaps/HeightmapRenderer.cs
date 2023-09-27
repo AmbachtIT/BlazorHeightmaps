@@ -73,11 +73,15 @@ namespace Ambacht.Common.Maps.Heightmaps
                 ColorType = PngColorType.Grayscale,
                 BitDepth = PngBitDepth.Bit16
             },
-            GetPixelFunc = GetPixel16Greyscale
+            GetPixelFunc = GetPixel16Greyscale()
         };
 
-        public static Func<float, L16> GetPixel16Greyscale => alpha =>
+        public static Func<float, L16> GetPixel16Greyscale(ushort nanValue = default) => alpha =>
         {
+	        if (float.IsNaN(alpha))
+	        {
+		        return new L16(nanValue);
+	        }
             var value = alpha * 65535;
             return new L16(Convert.ToUInt16(value));
         };

@@ -55,6 +55,11 @@ namespace Ambacht.Common.Maps.Arcgis
 
 		public int Height { get; set; }
 
+		/// <summary>
+		/// The pixel value representing no information.
+		/// </summary>
+		public float? NoData { get; set; }
+
 
 		public string Build()
 		{
@@ -69,6 +74,10 @@ namespace Ambacht.Common.Maps.Arcgis
 			builder.Append($"&bboxSR={BoundingBoxSR}");
 			builder.Append($"&imageSR={ImageSr}");
 			builder.Append($"&size={Width}%2C{Height}");
+			if (NoData.HasValue)
+			{
+				builder.Append($"&noData={NoData}");
+			}
 
 			return builder.ToString();
 		}

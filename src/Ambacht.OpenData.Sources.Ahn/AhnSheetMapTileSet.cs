@@ -41,9 +41,12 @@ namespace Ambacht.OpenData.Sources.Ahn
 
 		public IEnumerable<IMapTile> GetTiles(Rectangle bounds)
 		{
-			for (var y = bounds.Top; y < bounds.Bottom; y += KaartbladenIndex.BladHeightMeters)
+			var topLeft = _index.GetBlad( bounds.TopLeft());
+			var bottomRight = _index.GetBlad( bounds.BottomRight());
+
+			for (var y = topLeft.Y; y <= bottomRight.Y; y += KaartbladenIndex.BladHeightMeters)
 			{
-				for (var x = bounds.Left; x < bounds.Right; x += KaartbladenIndex.BladWidthMeters)
+				for (var x = topLeft.X; x <= bottomRight.X; x += KaartbladenIndex.BladWidthMeters)
 				{
 					var tile = GetTile(new(x, y));
 					if (tile != null)

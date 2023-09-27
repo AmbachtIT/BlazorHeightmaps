@@ -32,29 +32,20 @@ namespace BlazorHeightmaps
 		public async Task<Heightmap> GetHeightmap(LatLngBounds latLngBounds, Vector2 pixelSize)
 		{
 			var bounds = _projection.Project(latLngBounds).ExpandToMatchRatio(pixelSize);
+			var result = new Heightmap((int) pixelSize.X, (int) pixelSize.Y)
+			{
+				Bounds = bounds
+			};
 
-			var desiredMetersPerPixel = bounds.Width / pixelSize.X;
-
-			var heightmaps = new List<Heightmap>();
 			var tiles = _tileSet.GetTiles(bounds).ToList();
 			foreach (var tile in tiles)
 			{
 				var heightmap = await FetchHeightmap(tile);
 
-				var actualMetersPerPixel = heightmap.UnitsPerPixel.X;
-				var scale = (int)Math.Round(desiredMetersPerPixel / actualMetersPerPixel);
-
-				heightmap = heightmap.Downsample(scale);
-
-				heightmap.Crs = tile.Crs;
-				heightmap.Bounds = tile.Bounds;
-				heightmaps.Add(heightmap);
+				result.CopyFromRescaling(heightmap);
 			}
 
-			var stitched = Heightmap.Stitch(heightmaps);
-
-			return stitched.GetPixelArea(bounds.TopLeft(), (int)pixelSize.X,
-				(int)pixelSize.Y);
+			return result;
 		}
 
 		private async Task<Heightmap> FetchHeightmap(IMapTile tile)

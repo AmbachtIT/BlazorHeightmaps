@@ -190,9 +190,9 @@ namespace Ambacht.Common.Mathmatics
         /// </summary>
         public static T ReverseLerp<T>(T from, T to, T value) where T: IFloatingPoint<T>
         {
-            if (to <= from)
+            if (to == from)
             {
-                to = from + T.One;
+	            return default;
             }
 
             var delta = to - from;

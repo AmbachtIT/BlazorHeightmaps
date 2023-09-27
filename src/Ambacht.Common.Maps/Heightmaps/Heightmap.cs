@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Numerics;
 using System.Reflection.PortableExecutable;
 using System.Text;
@@ -21,7 +22,7 @@ namespace Ambacht.Common.Maps.Heightmaps
         {
             this.Width = width;
             this.Height = height;
-            this._data = new float[width, height];
+            this._data = new float[width * height];
         }
 
         public int Width { get; }
@@ -31,57 +32,56 @@ namespace Ambacht.Common.Maps.Heightmaps
 
         public Rectangle Bounds { get; set; }
 
-        private readonly float[,] _data;
+        /// <summary>
+        /// If strict mode is set to true, out of bounds indices will result in an OutOfRangeException, otherwise they will be silently ignored
+        /// </summary>
+        public bool StrictMode { get; set; } = true;
+
+        public float DefaultValue { get; set; } = float.NaN;
+
+        private readonly float[] _data;
 
 
         public float this[int x, int y]
         {
-            get => _data[x, y];
-            set
-            {
-                if (float.IsInfinity(value))
-                {
-                    throw new ArgumentException("float.infinity is not supported for height maps");
-                }
-                _data[x, y] = value;
-            }
+	        get
+	        {
+		        if (!Contains(x, y))
+		        {
+			        if (StrictMode)
+			        {
+				        throw new ArgumentOutOfRangeException($"Invalid index: {x}, {y}");
+			        }
+			        return float.NaN;
+		        }
+				return _data[x + y * Width]; 
+	        }
+	        set
+	        {
+		        if (!Contains(x, y))
+		        {
+			        if (StrictMode)
+			        {
+				        throw new ArgumentOutOfRangeException($"Invalid index: {x}, {y}");
+			        }
+
+			        return;
+		        }
+		        _data[x + y * Width] = value;
+	        }
         }
 
-        public IEnumerator<float> GetEnumerator()
-        {
-            foreach (var f in _data)
-            {
-                yield return f;
-            }
-        }
+        public IEnumerator<float> GetEnumerator() => ((IEnumerable<float>)_data).GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+		IEnumerator IEnumerable.GetEnumerator() => _data.GetEnumerator();
+
+		public void Clear(float? value = null)
+		{
+			var actual = value ?? DefaultValue;
+			_data.AsSpan().Fill(actual);
+		}
 
 
-        public void Save(Stream stream)
-        {
-            using var writer = new BinaryWriter(new GZipOutputStream(stream));
-            writer.Write(Magic);
-            writer.Write(Version);
-            writer.Write(Width);
-            writer.Write(Height);
-            writer.Write(Crs ?? "");
-            writer.Write(Bounds.Left);
-            writer.Write(Bounds.Top);
-            writer.Write(Bounds.Width);
-            writer.Write(Bounds.Height);
-
-            for (var y = 0; y < Height; y++)
-            {
-                for (var x = 0; x < Width; x++)
-                {
-                    writer.Write(this[x, y]);
-                }
-            }
-        }
 
 
 
@@ -133,7 +133,26 @@ namespace Ambacht.Common.Maps.Heightmaps
         }
 
 
-        public static Heightmap Load(Stream stream)
+		public void Save(Stream stream)
+		{
+			using var writer = new BinaryWriter(new GZipOutputStream(stream));
+			writer.Write(Magic);
+			writer.Write(Version);
+			writer.Write(Width);
+			writer.Write(Height);
+			writer.Write(Crs ?? "");
+			writer.Write(Bounds.Left);
+			writer.Write(Bounds.Top);
+			writer.Write(Bounds.Width);
+			writer.Write(Bounds.Height);
+
+			for (var i = 0; i < _data.Length; i++)
+			{
+				writer.Write(_data[i]);
+			}
+		}
+
+		public static Heightmap Load(Stream stream)
         {
             using var reader = new BinaryReader(new GZipInputStream(stream), Encoding.UTF8);
             if (reader.ReadUInt32() != Magic || reader.ReadUInt32() != Version)
@@ -147,14 +166,10 @@ namespace Ambacht.Common.Maps.Heightmaps
             };
             result.Bounds = new Rectangle(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 
-            for (var y = 0; y < result.Height; y++)
+            for (var i = 0; i < result._data.Length; i++)
             {
-                for (var x = 0; x < result.Width; x++)
-                {
-                    result[x, y] = reader.ReadSingle();
-                }
+                result._data[i] = reader.ReadSingle();
             }
-
             return result;
         }
 
@@ -166,19 +181,141 @@ namespace Ambacht.Common.Maps.Heightmaps
         public bool Contains(int x, int y)
         {
 	        return x >= 0 && x < Width
-	                      && y >= 0 && y < Height;
+	            && y >= 0 && y < Height;
         }
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <remarks>
+		/// Automatically detects whether rescaling is necessary
+		/// </remarks>
+		/// <param name="target"></param>
+		/// <exception cref="InvalidOperationException"></exception>
         public void CopyTo(Heightmap target)
         {
 	        if (Crs != target.Crs)
 	        {
-		        throw new InvalidOperationException("This only works if source and target CRS are the same");
+		        throw new InvalidOperationException("This only works if source and source CRS are the same");
 	        }
+
+	        if ((UnitsPerPixel - target.UnitsPerPixel).Length() > .001)
+	        {
+		        throw new InvalidOperationException("Can't blit heightmap, they have different scales");
+	        }
+
 	        var alpha = MathUtil.ReverseLerp(target.Bounds.TopLeft(), target.Bounds.BottomRight(), Bounds.TopLeft());
 	        var sx = (int)(alpha.X * target.Width);
 			var sy = (int)(alpha.Y * target.Height);
             CopyTo(target, sx, sy);
+        }
+
+        public void CopyFromRescaling(Heightmap source)
+        {
+	        if (Crs != source.Crs)
+	        {
+		        throw new InvalidOperationException("This only works if source and source CRS are the same");
+	        }
+
+	        for (var y = 0; y < Height; y++)
+	        {
+		        for (var x = 0; x < Width; x++)
+		        {
+			        var pixelBounds = GetPixelBounds(x, y);
+			        if (!pixelBounds.Overlaps(source.Bounds))
+			        {
+						continue;
+			        }
+
+			        this[x, y] = source.GetInterpolatedValue(pixelBounds);
+		        }
+	        }
+        }
+
+        public float GetInterpolatedValue(Rectangle rect)
+        {
+	        var count = 0f;
+			var total = 0f;
+	        var (fromX, fromY) = GetIndex(rect.TopLeft());
+	        var (toX, toY) = GetIndex(rect.BottomRight());
+	        for (var y = fromY; y <= toY; y++)
+	        {
+		        if (y < 0 || y >= Height)
+		        {
+					continue;
+		        }
+
+		        for (var x = fromX; x <= toX; x++)
+		        {
+			        if (x < 0 || x >= Width)
+			        {
+				        continue;
+			        }
+
+			        var value = this[x, y];
+			        if (!float.IsNaN(value))
+			        {
+				        count++;
+						total += value;
+			        }
+		        }
+	        }
+
+	        if (count == 0f)
+	        {
+				return float.NaN;
+	        }
+			return total / count;
+		}
+
+
+		/// <summary>
+		/// Gets index of specified coordinates
+		/// </summary>
+		public (int, int) GetIndex(Vector2 pos)
+		{
+			var lerped = MathUtil.ReverseLerp(Bounds.TopLeft(), Bounds.BottomRight(), pos);
+			return ((int) (lerped.X * Width), (int) (lerped.Y * Height));
+		}
+
+        public Rectangle GetPixelBounds(int x, int y)
+        {
+	        var pixelWidth = Bounds.Width / Width;
+			var pixelHeight = Bounds.Height / Height;
+			return new Rectangle(
+				Bounds.Left + x * pixelWidth,
+				Bounds.Top + y * pixelHeight,
+				pixelWidth,
+				pixelHeight
+			);
+        }
+
+		public Span<float> GetRowSpan(int y)
+        {
+	        if (y < 0 || y >= Height)
+	        {
+		        if (StrictMode)
+		        {
+					throw new ArgumentOutOfRangeException(nameof(y));
+		        }
+				return Span<float>.Empty;
+	        }
+
+	        return _data.AsSpan(y * Width, Width);
+        }
+
+        public Span<float> GetRowSpan(int y, Range<int> xRange)
+        {
+	        if (y < 0 || y >= Height)
+	        {
+		        if (StrictMode)
+		        {
+			        throw new ArgumentOutOfRangeException(nameof(y));
+		        }
+		        return Span<float>.Empty;
+	        }
+
+	        return _data.AsSpan(y * Width, Width);
         }
 
 		public void CopyTo(Heightmap target, int tx, int ty)
@@ -280,5 +417,16 @@ namespace Ambacht.Common.Maps.Heightmaps
         public Vector2 UnitsPerPixel => new(Bounds.Width / Width, Bounds.Height / Height);
 
 
+		/// <summary>
+		/// Multiply all data with a fixed value
+		/// </summary>
+		/// <param name="value"></param>
+        public void Multiply(float value)
+        {
+	        for (var i = 0; i < _data.Length; i++)
+	        {
+				_data[i] *= value;
+	        }
+        }
     }
 }

@@ -35,6 +35,7 @@ namespace BlazorHeightmaps
 				Height = (int)pixelSize.Y,
 				Format = "tiff",
 				PixelType = "F32",
+				NoData = -10,
 				BoundingBox = rdBounds,
 				BoundingBoxSR = Crs.Rd,
 				ImageSr = Crs.Rd
