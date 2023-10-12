@@ -1,0 +1,35 @@
+﻿@using BlazorHeightmaps.Presets
+<Label>
+  Preset
+  <select @onchange="@OnPresetChanged" class="text-black">
+    @foreach (var preset in Preset.All())
+    {
+      <option value="@preset.Name" selected="@(preset == _selectedPreset)">@preset.Name</option>
+    }
+  </select>
+
+</Label>
+<InputSelect>
+
+</InputSelect>
+
+@code {
+
+  [CascadingParameter()]
+  public State State { get; set; }
+
+  private Preset _selectedPreset = Preset.CitiesSkylines;
+
+  private void OnPresetChanged(ChangeEventArgs e)
+  {
+    var preset = Preset.ByName((string)e.Value);
+    if (preset == null)
+    {
+      return;
+    }
+    _selectedPreset = preset;
+
+    State?.Apply(preset);
+  }
+
+}

@@ -1,0 +1,22 @@
+﻿<path d="@Value?.GetSvgPath(View)" fill="@Fill" stroke="@Stroke" stroke-width="@StrokeWidth" style="pointer-events: none;" />
+
+@code {
+
+
+	[Parameter()]
+	public NetTopologySuite.Geometries.Polygon Value { get; set; }
+
+	[Parameter()]
+	public string Fill { get; set; } = "#aaaaaa";
+
+	[Parameter()]
+	public string Stroke { get; set; } = "#000000";
+
+	[Parameter()]
+	public float StrokeWidth { get; set; } = 1f;
+
+	[CascadingParameter()]
+	public SlippyMapView View { get; set; }
+
+
+}

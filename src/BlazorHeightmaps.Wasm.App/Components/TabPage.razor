@@ -1,0 +1,55 @@
+﻿@if (TabControl.SelectedPage == this)
+{
+	<div class="@ContentClass()">
+    @ChildContent
+  </div>
+}
+
+@code {
+
+	[Parameter()]
+	public string Header { get; set; }
+
+	[Parameter()]
+	public string TextColor { get; set; }
+
+	[Parameter()]
+	public string BackgroundColor { get; set; }
+
+	[CascadingParameter()]
+	public TabControl TabControl { get; set; }
+
+	[Parameter()]
+	public RenderFragment ChildContent { get; set; }
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		if (TabControl == null)
+		{
+			throw new InvalidOperationException("Should be child of a tab control");
+		}
+		TabControl.Register(this);
+	}
+
+	public string ContentClass() => GetClass("p-4 w-full");
+
+  public string ButtonClass() => GetClass("p-4 mx-2 inline-block");
+
+	private string GetClass(string result)
+	{
+		if (!string.IsNullOrEmpty(TextColor))
+		{
+			result += $" text-[{TextColor}]";
+		}
+		if (!string.IsNullOrEmpty(BackgroundColor))
+		{
+			result += $" bg-[{BackgroundColor}]";
+		}
+		return result;
+	}
+
+
+}
+
+

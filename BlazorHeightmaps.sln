@@ -24,11 +24,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambacht.Common.Maps", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambacht.OpenData.Sources.Ahn", "src\Ambacht.OpenData.Sources.Ahn\Ambacht.OpenData.Sources.Ahn.csproj", "{5D1240A1-1356-49D7-B9F4-CB30F6F5D33D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorHeightmaps", "src\BlazorHeightmaps\BlazorHeightmaps.csproj", "{2AB8C48E-6980-4F79-9514-6551DE381D0A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorHeightmaps", "src\BlazorHeightmaps\BlazorHeightmaps.csproj", "{2AB8C48E-6980-4F79-9514-6551DE381D0A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{AEE5DD94-600D-419F-82BB-D7500BF42745}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorHeightmaps.Test", "test\BlazorHeightmaps.Test\BlazorHeightmaps.Test.csproj", "{6BB996D5-5791-4B9B-925A-4BCBCDAD4377}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorHeightmaps.Test", "test\BlazorHeightmaps.Test\BlazorHeightmaps.Test.csproj", "{6BB996D5-5791-4B9B-925A-4BCBCDAD4377}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

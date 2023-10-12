@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Numerics;
 using System.Security.AccessControl;
 using System.Text;
@@ -20,16 +21,28 @@ namespace Ambacht.Common.Maps
         /// <param name="v"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public LatLng Translate(Vector3 v)
-        {
-            return new(
-                Latitude + v.Y / Earth.MetersPerDegreeF,
-            Longitude + v.X / Earth.GetMetersPerDegreeF(Latitude)
-            );
-        }
-    }
+        public LatLng Translate(Vector3 v) => Translate(new Vector2(v.X, v.Y));
 
-    public record struct LatLngAltitude(float Latitude, float Longitude, float Altitude)
+        /// <summary>
+        /// Translates this position. NOTE: ONLY WORKS ON SMALL SCALES
+        /// </summary>
+        /// <param name="v">translation in meters</param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public LatLng Translate(Vector2 v)
+        {
+	        return new(
+		        Latitude + v.Y / Earth.MetersPerDegreeF,
+		        Longitude + v.X / Earth.GetMetersPerDegreeF(Latitude)
+	        );
+        }
+
+
+        public static LatLng operator +(LatLng l1, LatLng l2) => new(l1.Latitude + l2.Latitude, l1.Longitude + l2.Longitude);
+        public static LatLng operator -(LatLng l1, LatLng l2) => new(l1.Latitude - l2.Latitude, l1.Longitude - l2.Longitude);
+	}
+
+	public record struct LatLngAltitude(float Latitude, float Longitude, float Altitude)
     {
         public LatLng ToLatLng() => new LatLng(Latitude, Longitude);
 

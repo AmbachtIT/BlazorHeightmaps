@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Ambacht.Common.Maps.Projections;
+using Ambacht.Common.Maps.Tiles;
 using Ambacht.Common.Mathmatics;
 using NetTopologySuite.Algorithm;
 using NetTopologySuite.Geometries;
@@ -97,7 +99,12 @@ namespace Ambacht.Common.Maps
             return new Vector2((float)p.X, (float)p.Y);
         }
 
-        public static Point ToPoint(this Vector2 v)
+        public static LatLng ToLatLng(this Coordinate p)
+        {
+	        return new LatLng((float)p.Y, (float)p.X);
+        }
+
+		public static Point ToPoint(this Vector2 v)
         {
             return new Point(v.X, v.Y);
         }
@@ -198,5 +205,105 @@ namespace Ambacht.Common.Maps
         public static bool Contains(this Geometry geometry, Vector2 v) => geometry.Contains(new Point(v.X, v.Y));
 
 
-    }
+
+        public static string GetSvgPath(this NetTopologySuite.Geometries.Polygon polygon, WorldView view)
+        {
+	        return polygon?.ExteriorRing?.GetSvgPath(view);
+        }
+
+        public static string GetSvgPath(this NetTopologySuite.Geometries.Polygon polygon, SlippyMapView view)
+        {
+	        return polygon?.ExteriorRing?.GetSvgPath(view);
+        }
+
+
+        public static string GetSvgPath(this LatLngBounds rect, SlippyMapView view)
+        {
+			var builder = new StringBuilder();
+
+			foreach (var coord in new []
+			         {
+                         rect.NorthEast, rect.NorthWest, rect.SouthWest, rect.SouthEast, rect.NorthEast
+			         })
+			{
+				if (builder.Length == 0)
+				{
+					builder.Append("M");
+				}
+				else
+				{
+					builder.Append(" L");
+				}
+				builder.Append(' ');
+				builder.Write(coord, view);
+			}
+
+			return builder.ToString();
+		}
+
+		public static string GetSvgPath(this LineString line, WorldView view)
+        {
+	        var builder = new StringBuilder();
+
+	        foreach (var coord in line.Coordinates)
+	        {
+		        if (builder.Length == 0)
+		        {
+			        builder.Append("M");
+		        }
+		        else
+		        {
+			        builder.Append(" L");
+		        }
+		        builder.Append(' ');
+		        builder.Write(coord, view);
+	        }
+
+	        return builder.ToString();
+        }
+
+
+        public static string GetSvgPath(this LineString line, SlippyMapView view)
+        {
+	        var builder = new StringBuilder();
+
+	        foreach (var coord in line.Coordinates)
+	        {
+		        if (builder.Length == 0)
+		        {
+			        builder.Append("M");
+		        }
+		        else
+		        {
+			        builder.Append(" L");
+		        }
+		        builder.Append(' ');
+		        builder.Write(coord.ToLatLng(), view);
+	        }
+
+	        return builder.ToString();
+        }
+
+		public static void Write(this StringBuilder builder, Coordinate coord, WorldView view)
+        {
+	        var pos = view.WorldToScreen(coord.ToVector2());
+	        builder.Append(pos.X.ToString(_neutral));
+	        builder.Append(" ");
+	        builder.Append(pos.Y.ToString(_neutral));
+        }
+
+
+        public static void Write(this StringBuilder builder, LatLng coord, SlippyMapView view)
+        {
+	        var pos = view.LatLngToView(coord);
+	        builder.Append(pos.X.ToString(_neutral));
+	        builder.Append(" ");
+	        builder.Append(pos.Y.ToString(_neutral));
+        }
+
+		private static readonly IFormatProvider _neutral = CultureInfo.InvariantCulture;
+
+
+
+	}
 }

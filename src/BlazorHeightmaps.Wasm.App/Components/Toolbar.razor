@@ -1,0 +1,39 @@
+﻿<div class="absolute w-full h-40 z-20 p-2">
+
+  <TabControl>
+    <TabPage Header="Heightmap" TextColor="#ffffff" BackgroundColor="#252b48">
+
+
+      <HeightmapToolbar />
+
+    </TabPage>
+
+    <TabPage Header="Transformation" TextColor="#ffffff" BackgroundColor="#445069">
+
+      <p>
+        Transformation
+      </p>
+
+
+    </TabPage>
+
+    <TabPage Header="Output" TextColor="#ffffff" BackgroundColor="#5b9a8b">
+
+      <p>
+        Output
+      </p>
+
+
+    </TabPage>
+
+  </TabControl>
+
+</div>
+
+
+@code {
+
+  [CascadingParameter()]
+	public State State { get; set; }
+
+}

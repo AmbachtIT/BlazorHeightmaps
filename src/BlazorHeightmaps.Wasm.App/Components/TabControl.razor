@@ -1,0 +1,51 @@
+﻿@foreach (var p in _pages)
+{
+  <button class="@p.ButtonClass()" onclick="@(() => Click(p))">@p.Header</button>
+}
+
+<CascadingValue Value="this">
+  @ChildContent
+</CascadingValue>
+
+@code {
+
+	[Parameter()]
+	public RenderFragment ChildContent { get; set; }
+
+  [Parameter()]
+	public TabPage SelectedPage { get; set; }
+
+	private readonly List<TabPage> _pages = new();
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		base.OnAfterRender(firstRender);
+		if (firstRender)
+		{
+      StateHasChanged(); // pages are now registered, so display them
+		}
+	}
+
+	private void Click(TabPage page)
+	{
+		if (SelectedPage == page)
+		{
+			SelectedPage = null;
+		}
+		else
+		{
+			SelectedPage = page;
+		}
+    StateHasChanged();
+	}
+
+	internal void Register(TabPage page)
+	{
+		_pages.Add(page);
+		if (SelectedPage == null)
+		{
+			SelectedPage = page;
+		}
+	}
+
+}

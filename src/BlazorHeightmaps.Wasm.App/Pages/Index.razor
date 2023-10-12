@@ -1,9 +1,13 @@
 ﻿@page "/"
 
-<SlippyMap @bind-Center="_state.Center" @bind-ZoomLevel="_state.ZoomLevel" Class="w-screen h-screen overflow-hidden">
-  
+<CascadingValue Value="@_state">
+  <Toolbar />
+  <SlippyMap @bind-Center="_state.Center" @bind-ZoomLevel="_state.ZoomLevel" Class="w-screen h-screen overflow-hidden">
 
-</SlippyMap>
+    <Overlay />
+
+  </SlippyMap>
+</CascadingValue>
 
 
 @code
@@ -12,7 +16,9 @@
 	private State _state = new State()
 	{
 		Center = new(52.08f, 5.1f),
-		ZoomLevel = 13
+		ZoomLevel = 12
 	};
+
+
 
 }

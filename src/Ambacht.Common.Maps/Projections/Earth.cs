@@ -29,7 +29,7 @@ namespace Ambacht.Common.Maps.Projections
 
         public static float GetMetersPerDegreeF(float latitude)
         {
-            return MathF.Cos(latitude * 180f / MathF.PI) * MetersPerDegreeF;
+            return MathF.Cos(latitude * MathF.PI / 180f) * MetersPerDegreeF;
         }
     }
 }

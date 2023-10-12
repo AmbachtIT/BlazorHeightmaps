@@ -576,12 +576,33 @@ video {
   position: absolute;
 }
 
+.z-20 {
+  z-index: 20;
+}
+
+.mx-2 {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
 .hidden {
   display: none;
 }
 
+.h-40 {
+  height: 10rem;
+}
+
 .h-screen {
   height: 100vh;
+}
+
+.w-full {
+  width: 100%;
 }
 
 .w-screen {
@@ -598,6 +619,52 @@ video {
 
 .border {
   border-width: 1px;
+}
+
+.bg-\[\#252b48\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(37 43 72 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#445069\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(68 80 105 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#5b9a8b\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(91 154 139 / var(--tw-bg-opacity));
+}
+
+.p-2 {
+  padding: 0.5rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.text-\[\#ffffff\] {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.text-black {
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity));
+}
+
+body {
+  font-family: inter, sans-serif
 }
 
 h1:focus {
