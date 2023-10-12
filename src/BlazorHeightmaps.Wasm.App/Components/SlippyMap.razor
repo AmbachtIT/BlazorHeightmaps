@@ -39,14 +39,19 @@
 
 @code {
 
-  [Parameter()]
-  public float Latitude { get; set; }
 
   [Parameter()]
-  public float Longitude { get; set; }
+	public LatLng Center { get; set; }
+
+	[Parameter()]
+	public EventCallback<LatLng> CenterChanged { get; set; }
 
   [Parameter()]
   public int ZoomLevel { get; set; }
+
+	[Parameter()]
+  public EventCallback<int> ZoomLevelChanged { get; set; }
+
 
   [Parameter()]
   public EventCallback<SlippyMapView> OnViewChanged { get; set; }
@@ -75,7 +80,7 @@
       Console.WriteLine($"Size: {size}");
       await SetView(new SlippyMapView()
 	          {
-		            Coords = new(Latitude, Longitude),
+		            Coords = Center,
 		            Zoom = ZoomLevel,
 		            Size = size,
 		            TileSize = _set.TileSize
@@ -103,6 +108,8 @@
       {
           Coords = SlippyMath.PixelToLatLng(pos, _view.ZoomLevel, _set.TileSize)
       });
+
+	    await CenterChanged.InvokeAsync(_view.Coords);
   }
 
     private bool _dragging = false;
@@ -160,6 +167,7 @@
 		    Coords = SlippyMath.PixelToLatLng(center, _view.ZoomLevel, _set.TileSize),
 		    Zoom = newZoomLevel
 		    });
+	    await ZoomLevelChanged.InvokeAsync(_view.ZoomLevel);
     }
 
 
