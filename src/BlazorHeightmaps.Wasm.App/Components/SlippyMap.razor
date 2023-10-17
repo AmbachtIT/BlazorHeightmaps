@@ -49,6 +49,9 @@
   public EventCallback<SlippyMapView> OnViewChanged { get; set; }
 
   [Parameter()]
+  public float Angle { get; set; }
+
+  [Parameter()]
   public RenderFragment ChildContent { get; set; }
 
   [Parameter()]
@@ -72,8 +75,19 @@
     await SetView(_view with {
       Coords = Center,
       Zoom = ZoomAmount,
+      Angle = Angle,
       Size = size,
     });
+  }
+
+  protected override async Task OnParametersSetAsync()
+  {
+    await base.OnParametersSetAsync();
+    await SetView(_view with {
+      Coords = Center,
+      Zoom = ZoomAmount,
+      Angle = Angle,
+      });
   }
 
   private const int TileSize = 256;
@@ -96,11 +110,7 @@
   /// <remarks>Delta are in component pixel space, which has the same scale as tile pixel space</remarks>
   public async Task Pan(Vector2 delta)
   {
-    var pos = SlippyMath.LatLngToPixel(_view.Coords, _view.ZoomLevel, TileSize) - delta;
-      await SetView(_view with
-      {
-        Coords = SlippyMath.PixelToLatLng(pos, _view.ZoomLevel, TileSize)
-      });
+      await SetView(_view.Pan(delta));
 
 	    await CenterChanged.InvokeAsync(_view.Coords);
   }

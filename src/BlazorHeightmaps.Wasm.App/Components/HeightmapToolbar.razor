@@ -13,8 +13,8 @@
   </Input>
 
   <Input LabelText="Rotation" class="flex-none mx-2">
-    <Button>Left</Button>
-    <Button>Right</Button>
+    <Button OnClick="@Left">Left</Button>
+    <Button OnClick="@Right">Right</Button>
   </Input>
 
 
@@ -37,6 +37,19 @@
     _selectedPreset = preset;
 
     State?.Apply(preset);
+  }
+
+
+  private void Left()
+  {
+    State.Angle += 10;
+    State.OnStateChanged();
+  }
+
+  private void Right()
+  {
+    State.Angle -= 10;
+    State.OnStateChanged();
   }
 
 }

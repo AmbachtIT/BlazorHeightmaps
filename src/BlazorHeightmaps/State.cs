@@ -18,10 +18,13 @@ namespace BlazorHeightmaps
 
 		public float Zoom { get; set; }
 
-		/// <summary>
-		/// Bounds to draw
-		/// </summary>
-		public LatLngBounds Bounds =>
+    public float Angle { get; set; }
+
+
+    /// <summary>
+    /// Bounds to draw
+    /// </summary>
+    public LatLngBounds Bounds =>
 			new LatLngBounds(Center.Translate(SizeMeters / 2f), Center.Translate(-SizeMeters / 2f));
 
 		/// <summary>
@@ -50,7 +53,7 @@ namespace BlazorHeightmaps
 		public Vector2? BuildableSizePixels { get; set; } = new Vector2(601, 601);
 
 		public Vector2? BuildableSizeMeters => BuildableSizePixels * MetersPerPixel;
-
+    
 
     public void OnStateChanged()
     {

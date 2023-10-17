@@ -67,7 +67,7 @@ namespace Ambacht.Common.Maps.Tiles
                 {
                     Key = tile.ToString(),
                     Image = GetUrl(tile.X, tile.Y, tile.Z),
-                    Coords = tile.Bounds().NorthWest,
+                    Coords = tile.Bounds().Center(),
                 };
                 tileImage.UpdateView(view);
                 yield return tileImage;

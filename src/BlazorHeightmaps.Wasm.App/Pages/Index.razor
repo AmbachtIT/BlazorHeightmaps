@@ -1,8 +1,9 @@
 ﻿@page "/"
+@implements IDisposable
 
 <CascadingValue Value="@_state">
   <Toolbar />
-  <SlippyMap @bind-Center="_state.Center" @bind-ZoomAmount="_state.Zoom" Class="w-screen h-screen overflow-hidden">
+  <SlippyMap @bind-Center="_state.Center" @bind-ZoomAmount="_state.Zoom" Angle="@_state.Angle" Class="w-screen h-screen overflow-hidden">
     <SlippyTileLayer />
 
     <Overlay />
@@ -20,6 +21,20 @@
 		Zoom = 12
 	};
 
+  protected override void OnInitialized()
+  {
+      base.OnInitialized();
+      _state.StateHasChanged += StateOnStateHasChanged;
+  }
+
+  private void StateOnStateHasChanged(object sender, EventArgs e)
+  {
+      StateHasChanged();
+  }
 
 
+  public void Dispose()
+  {
+      _state.StateHasChanged -= StateOnStateHasChanged;
+  }
 }
