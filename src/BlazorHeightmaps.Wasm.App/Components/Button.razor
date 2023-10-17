@@ -1,0 +1,11 @@
+﻿<button class="bg-white text-black p-1" onclick="@OnClick">@ChildContent</button>
+
+@code {
+
+  [Parameter()]
+  public EventCallback OnClick { get; set; }
+
+  [Parameter()]
+  public RenderFragment ChildContent { get; set; }
+
+}

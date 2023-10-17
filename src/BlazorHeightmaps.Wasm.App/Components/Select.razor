@@ -1,0 +1,13 @@
+﻿<select @onchange="@OnChanged" class="text-black bg-white p-1">
+  @ChildContent
+</select>
+
+@code {
+
+  [Parameter()]
+  public RenderFragment ChildContent { get; set; }
+
+  [Parameter()]
+  public EventCallback<ChangeEventArgs> OnChanged { get; set; }
+
+}

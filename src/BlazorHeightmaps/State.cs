@@ -16,7 +16,7 @@ namespace BlazorHeightmaps
 
 		public LatLng Center { get; set; }
 
-		public int ZoomLevel { get; set; }
+		public float Zoom { get; set; }
 
 		/// <summary>
 		/// Bounds to draw

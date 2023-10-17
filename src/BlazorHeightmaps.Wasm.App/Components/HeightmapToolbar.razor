@@ -1,17 +1,24 @@
 ﻿@using BlazorHeightmaps.Presets
-<Label>
-  Preset
-  <select @onchange="@OnPresetChanged" class="text-black">
-    @foreach (var preset in Preset.All())
-    {
-      <option value="@preset.Name" selected="@(preset == _selectedPreset)">@preset.Name</option>
-    }
-  </select>
 
-</Label>
-<InputSelect>
+<div class="flex">
 
-</InputSelect>
+  <Input LabelText="Preset" class="flex-none mx-2">
+    <Select OnChanged="@OnPresetChanged">
+      @foreach (var preset in Preset.All())
+      {
+        <option value="@preset.Name" selected="@(preset == _selectedPreset)">@preset.Name</option>
+      }
+    </Select>
+
+  </Input>
+
+  <Input LabelText="Rotation" class="flex-none mx-2">
+    <Button>Left</Button>
+    <Button>Right</Button>
+  </Input>
+
+
+</div>
 
 @code {
 

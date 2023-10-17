@@ -48,11 +48,10 @@
 	public EventCallback<LatLng> CenterChanged { get; set; }
 
   [Parameter()]
-  public int ZoomLevel { get; set; }
+  public float ZoomAmount { get; set; }
 
-	[Parameter()]
-  public EventCallback<int> ZoomLevelChanged { get; set; }
-
+  [Parameter()]
+  public EventCallback<float> ZoomAmountChanged { get; set; }
 
   [Parameter()]
   public EventCallback<SlippyMapView> OnViewChanged { get; set; }
@@ -82,7 +81,7 @@
       await SetView(new SlippyMapView()
 	          {
 		            Coords = Center,
-		            Zoom = ZoomLevel,
+		            Zoom = ZoomAmount,
 		            Size = size,
 		            TileSize = _set.TileSize
 	          });
@@ -92,10 +91,14 @@
 
   private async Task SetView(SlippyMapView newView)
   {
-    _view = newView;
-    _visibleTiles = _set.GetVisibleTiles(_view).ToList();
-    this.StateHasChanged();
-    await OnViewChanged.InvokeAsync(_view);
+      if (_view.Equals(newView))
+      {
+          return;
+      }
+      _view = newView;
+      _visibleTiles = _set.GetVisibleTiles(_view).ToList();
+      this.StateHasChanged();
+      await OnViewChanged.InvokeAsync(_view);
   }
 
   #region panning state
@@ -160,15 +163,15 @@
 
     public async Task Zoom(int deltaLevels, Vector2 pos)
     {
-    var newZoomLevel = Math.Clamp(_view.ZoomLevel + deltaLevels, _set.MinZoom, _set.MaxZoom);
-    var center = SlippyMath.LatLngToPixel(_view.Coords, _view.ZoomLevel, _set.TileSize);
-      center -= _view.HalfSize;
-      center += pos;
-	    await SetView(_view with {
-		    Coords = SlippyMath.PixelToLatLng(center, _view.ZoomLevel, _set.TileSize),
-		    Zoom = newZoomLevel
-		    });
-	    await ZoomLevelChanged.InvokeAsync(_view.ZoomLevel);
+        var newZoomAmount = Math.Clamp(_view.ZoomLevel + deltaLevels, _set.MinZoom, _set.MaxZoom);
+        var center = SlippyMath.LatLngToPixel(_view.Coords, _view.ZoomLevel, _set.TileSize);
+        center -= _view.HalfSize;
+        center += pos;
+        await SetView(_view with {
+          Coords = SlippyMath.PixelToLatLng(center, _view.ZoomLevel, _set.TileSize),
+          Zoom = newZoomAmount
+          });
+        await ZoomAmountChanged.InvokeAsync(_view.Zoom);
     }
 
 
@@ -177,11 +180,11 @@
 
     private async Task OnMouseWheel(WheelEventArgs args)
     {
-      _amountLeft -= args.DeltaY;
-      var levels = (int)(_amountLeft / _amountPerLevel);
-      _amountLeft -= levels * _amountPerLevel;
-      var current = new Vector2((float)args.ClientX, (float)args.ClientY);
-      await Zoom(levels, current);
+        _amountLeft -= args.DeltaY;
+        var levels = (int)(_amountLeft / _amountPerLevel);
+        _amountLeft -= levels * _amountPerLevel;
+        var current = new Vector2((float)args.ClientX, (float)args.ClientY);
+        await Zoom(levels, current);
     }
 
     #endregion

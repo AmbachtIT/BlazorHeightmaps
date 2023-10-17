@@ -2,7 +2,7 @@
 
 <CascadingValue Value="@_state">
   <Toolbar />
-  <SlippyMap @bind-Center="_state.Center" @bind-ZoomLevel="_state.ZoomLevel" Class="w-screen h-screen overflow-hidden">
+  <SlippyMap @bind-Center="_state.Center" @bind-ZoomAmount="_state.Zoom" Class="w-screen h-screen overflow-hidden">
 
     <Overlay />
 
@@ -16,7 +16,7 @@
 	private State _state = new State()
 	{
 		Center = new(52.08f, 5.1f),
-		ZoomLevel = 12
+		Zoom = 12
 	};
 
 
