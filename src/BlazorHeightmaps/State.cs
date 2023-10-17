@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Ambacht.Common.Maps;
+using Ambacht.Common.Maps.Tiles;
 using Ambacht.Common.Mathmatics;
 using BlazorHeightmaps.Presets;
 
@@ -19,6 +20,8 @@ namespace BlazorHeightmaps
 		public float Zoom { get; set; }
 
     public float Angle { get; set; }
+
+    public string Set { get; set; } = SlippyTileSet.OpenStreetMap.Name;
 
 
     /// <summary>

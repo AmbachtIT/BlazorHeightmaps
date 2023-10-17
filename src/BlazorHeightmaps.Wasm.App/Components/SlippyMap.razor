@@ -162,7 +162,7 @@
 
     public async Task Zoom(int deltaLevels, Vector2 pos)
     {
-        var newZoomAmount = Math.Clamp(_view.ZoomLevel + deltaLevels, 1, 19);
+        var newZoomAmount = Math.Clamp(_view.ZoomLevel + deltaLevels, 1, 21);
         var center = SlippyMath.LatLngToPixel(_view.Coords, _view.ZoomLevel, TileSize);
         center -= _view.HalfSize;
         center += pos;

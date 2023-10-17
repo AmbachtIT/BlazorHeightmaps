@@ -1,17 +1,37 @@
-﻿@foreach (var tile in _visibleTiles)
+﻿@if (_set == null)
 {
-  <img class="tile"
-       @key="tile.Key"
-       src="@tile.Image" 
-       style="@tile.Style" />
+  <span>No tile set selected</span>
+}
+else
+{
+  foreach (var tile in _visibleTiles)
+  {
+    <img class="tile"
+    @key="tile.Key"
+         src="@tile.Image"
+         style="@tile.Style" />
+  }
+
 }
 
 
 
 @code {
   private List<SlippyTileViewModel> _visibleTiles = new();
-  private readonly SlippyTileSet _set = SlippyTileSet.OpenStreetMap;
+  
 
+  [Parameter()]
+  public SlippyTileSet Set
+  {
+    get => _set;
+    set
+    {
+      _set = value; 
+      Update();
+    }
+  }
+
+  private SlippyTileSet _set;
 
   [CascadingParameter()]
   public SlippyMapView View
@@ -28,6 +48,10 @@
 
   private void Update()
   {
+    if (_set == null)
+    {
+      return;
+    }
     _visibleTiles = _set.GetVisibleTiles(View).ToList();
   }
 

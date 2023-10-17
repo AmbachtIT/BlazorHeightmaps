@@ -4,7 +4,7 @@
 <CascadingValue Value="@_state">
   <Toolbar />
   <SlippyMap @bind-Center="_state.Center" @bind-ZoomAmount="_state.Zoom" Angle="@_state.Angle" Class="w-screen h-screen overflow-hidden">
-    <SlippyTileLayer />
+    <SlippyTileLayer Set="@GetSet()" />
 
     <Overlay />
 
@@ -20,6 +20,8 @@
 		Center = new(52.08f, 5.1f),
 		Zoom = 12
 	};
+
+  private SlippyTileSet GetSet() => SlippyTileSet.ByName(_state.Set);
 
   protected override void OnInitialized()
   {

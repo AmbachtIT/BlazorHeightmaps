@@ -11,6 +11,16 @@
     </Select>
 
   </Input>
+  
+  <Input LabelText="Map" class="flex-none mx-2">
+    <Select OnChanged="@OnTileSetChanged">
+      @foreach (var set in SlippyTileSet.All().Where(s => s.TileSize == 256))
+      {
+        <option value="@set.Name" selected="@(set == _selectedSet)">@set.Name</option>
+      }
+    </Select>
+
+  </Input>
 
   <Input LabelText="Rotation" class="flex-none mx-2">
     <Button OnClick="@Left">Left</Button>
@@ -26,6 +36,20 @@
   public State State { get; set; }
 
   private Preset _selectedPreset = Preset.CitiesSkylines;
+  private SlippyTileSet _selectedSet = SlippyTileSet.OpenStreetMap;
+
+  private void OnTileSetChanged(ChangeEventArgs e)
+  {
+    var set = SlippyTileSet.ByName((string)e.Value);
+    if (set == null)
+    {
+      return;
+    }
+    _selectedSet = set;
+
+    State.Set = set.Name;
+    State.OnStateChanged();
+  }
 
   private void OnPresetChanged(ChangeEventArgs e)
   {
