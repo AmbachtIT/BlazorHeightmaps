@@ -1,0 +1,34 @@
+﻿@foreach (var tile in _visibleTiles)
+{
+  <img class="tile"
+       @key="tile.Key"
+       src="@tile.Image" 
+       style="@tile.Style" />
+}
+
+
+
+@code {
+  private List<SlippyTileViewModel> _visibleTiles = new();
+  private readonly SlippyTileSet _set = SlippyTileSet.OpenStreetMap;
+
+
+  [CascadingParameter()]
+  public SlippyMapView View
+  {
+    get => _view;
+    set
+    {
+      _view = value;
+      Update();
+    }
+  }
+
+  private SlippyMapView _view;
+
+  private void Update()
+  {
+    _visibleTiles = _set.GetVisibleTiles(View).ToList();
+  }
+
+}

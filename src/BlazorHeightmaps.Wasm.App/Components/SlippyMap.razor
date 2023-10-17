@@ -7,14 +7,6 @@
      @onmouseout="OnMouseOut"
      @onmousewheel="OnMouseWheel">
   <CascadingValue Value="_view">
-    @foreach (var tile in _visibleTiles)
-    {
-	    <img class="tile"
-           @key="tile.Key"
-           src="@tile.Image" 
-           style="@tile.Style" />
-    }
-
     @ChildContent
   </CascadingValue>
 </div>
@@ -67,26 +59,24 @@
   /// </summary>
   private ElementReference _container;
 
-  private SlippyMapView _view = new SlippyMapView();
-  private List<SlippyTileViewModel> _visibleTiles = new();
-  private readonly SlippyTileSet _set = SlippyTileSet.OpenStreetMap;
+  private SlippyMapView _view = new SlippyMapView()
+  {
+      TileSize = TileSize
+  };
+
 
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
-    if (firstRender)
-    {
-      var sizes = await JsRuntime.InvokeAsync<int[]>("Ambacht.getSize", _container);
-	    var size = new Vector2(sizes[0], sizes[1]);
-      Console.WriteLine($"Size: {size}");
-      await SetView(new SlippyMapView()
-	          {
-		            Coords = Center,
-		            Zoom = ZoomAmount,
-		            Size = size,
-		            TileSize = _set.TileSize
-	          });
-    }
+    var sizes = await JsRuntime.InvokeAsync<int[]>("Ambacht.getSize", _container);
+    var size = new Vector2(sizes[0], sizes[1]);
+    await SetView(_view with {
+      Coords = Center,
+      Zoom = ZoomAmount,
+      Size = size,
+    });
   }
+
+  private const int TileSize = 256;
 
 
   private async Task SetView(SlippyMapView newView)
@@ -96,7 +86,6 @@
           return;
       }
       _view = newView;
-      _visibleTiles = _set.GetVisibleTiles(_view).ToList();
       this.StateHasChanged();
       await OnViewChanged.InvokeAsync(_view);
   }
@@ -107,10 +96,10 @@
   /// <remarks>Delta are in component pixel space, which has the same scale as tile pixel space</remarks>
   public async Task Pan(Vector2 delta)
   {
-      var pos = SlippyMath.LatLngToPixel(_view.Coords, _view.ZoomLevel, _set.TileSize) - delta;
+    var pos = SlippyMath.LatLngToPixel(_view.Coords, _view.ZoomLevel, TileSize) - delta;
       await SetView(_view with
       {
-          Coords = SlippyMath.PixelToLatLng(pos, _view.ZoomLevel, _set.TileSize)
+        Coords = SlippyMath.PixelToLatLng(pos, _view.ZoomLevel, TileSize)
       });
 
 	    await CenterChanged.InvokeAsync(_view.Coords);
@@ -163,12 +152,12 @@
 
     public async Task Zoom(int deltaLevels, Vector2 pos)
     {
-        var newZoomAmount = Math.Clamp(_view.ZoomLevel + deltaLevels, _set.MinZoom, _set.MaxZoom);
-        var center = SlippyMath.LatLngToPixel(_view.Coords, _view.ZoomLevel, _set.TileSize);
+        var newZoomAmount = Math.Clamp(_view.ZoomLevel + deltaLevels, 1, 19);
+        var center = SlippyMath.LatLngToPixel(_view.Coords, _view.ZoomLevel, TileSize);
         center -= _view.HalfSize;
         center += pos;
         await SetView(_view with {
-          Coords = SlippyMath.PixelToLatLng(center, _view.ZoomLevel, _set.TileSize),
+        Coords = SlippyMath.PixelToLatLng(center, _view.ZoomLevel, TileSize),
           Zoom = newZoomAmount
           });
         await ZoomAmountChanged.InvokeAsync(_view.Zoom);
