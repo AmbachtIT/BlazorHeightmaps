@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ambacht.Common.Blazor\Ambacht.Common.Blazor.csproj" />
+    <ProjectReference Include="..\Ambacht.Common.Maps.Blazor\Ambacht.Common.Maps.Blazor.csproj" />
     <ProjectReference Include="..\Ambacht.Common.Maps\Ambacht.Common.Maps.csproj" />
     <ProjectReference Include="..\Ambacht.Common\Ambacht.Common.csproj" />
     <ProjectReference Include="..\BlazorHeightmaps\BlazorHeightmaps.csproj" />

@@ -30,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{AEE5DD94-6
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorHeightmaps.Test", "test\BlazorHeightmaps.Test\BlazorHeightmaps.Test.csproj", "{6BB996D5-5791-4B9B-925A-4BCBCDAD4377}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ambacht.Common.Maps.Blazor", "src\Ambacht.Common.Maps.Blazor\Ambacht.Common.Maps.Blazor.csproj", "{2185C7DD-7C0D-48FA-AC72-D84664C654BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{6BB996D5-5791-4B9B-925A-4BCBCDAD4377}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6BB996D5-5791-4B9B-925A-4BCBCDAD4377}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6BB996D5-5791-4B9B-925A-4BCBCDAD4377}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2185C7DD-7C0D-48FA-AC72-D84664C654BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2185C7DD-7C0D-48FA-AC72-D84664C654BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2185C7DD-7C0D-48FA-AC72-D84664C654BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2185C7DD-7C0D-48FA-AC72-D84664C654BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +80,7 @@ Global
 		{19A604C2-2748-447D-BC78-63C5DDA9EFEE} = {C6DFB23E-A7F4-4D02-B210-51081230D21F}
 		{5D1240A1-1356-49D7-B9F4-CB30F6F5D33D} = {C6DFB23E-A7F4-4D02-B210-51081230D21F}
 		{6BB996D5-5791-4B9B-925A-4BCBCDAD4377} = {AEE5DD94-600D-419F-82BB-D7500BF42745}
+		{2185C7DD-7C0D-48FA-AC72-D84664C654BF} = {C6DFB23E-A7F4-4D02-B210-51081230D21F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4EE962FA-3BF7-4C0A-8FFB-43A1669F9B30}
