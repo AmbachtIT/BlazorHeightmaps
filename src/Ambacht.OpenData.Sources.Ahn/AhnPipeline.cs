@@ -47,7 +47,7 @@ namespace Ambacht.OpenData.Sources.Ahn
         {
             // Collect heightmaps for all coordinates
             var tiles = rd.Select(c => _index.GetTile(set, c)).Distinct().ToList();
-            var totalBounds = Rectangle<double>.Cover(tiles.Select(h => h.Bounds));
+            var totalBounds = RectangleUtil.Cover(tiles.Select(h => h.Bounds));
 
             
 

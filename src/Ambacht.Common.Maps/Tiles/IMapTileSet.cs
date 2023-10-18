@@ -23,7 +23,7 @@ namespace Ambacht.Common.Maps.Tiles
 	{
 		public static IEnumerable<IMapTile> GetTiles(this IMapTileSet set, IEnumerable<Vector2<double>> points)
 		{
-			var bounds = Rectangle<double>.Cover(points.Select(p => set.GetTile(p).Bounds));
+			var bounds = RectangleUtil.Cover(points.Select(p => set.GetTile(p).Bounds));
 			return set.GetTiles(bounds);
 		}
 	}

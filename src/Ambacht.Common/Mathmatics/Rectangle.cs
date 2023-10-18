@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Ambacht.Common.Mathmatics
 {
 
-    public record struct Rectangle<T> : IFormattable where T : IFloatingPoint<T>, IMinMaxValue<T>
+    public record struct Rectangle<T> : IFormattable where T : IFloatingPoint<T>
     {
 
       public static readonly T Two = T.One + T.One;
@@ -59,53 +59,7 @@ namespace Ambacht.Common.Mathmatics
         }
 
 
-        public static Rectangle<T> Cover(IEnumerable<Vector2<T>> points)
-        {
-            var minX = T.MaxValue;
-            var minY = T.MaxValue;
-            var maxX = T.MinValue;
-            var maxY = T.MinValue;
-
-            foreach (var point in points)
-            {
-                minX = T.Min(minX, point.X);
-                minY = T.Min(minY, point.Y);
-
-                maxX = T.Max(maxX, point.X);
-                maxY = T.Max(maxY, point.Y);
-            }
-
-            if (minX == T.MaxValue)
-            {
-                return Empty;
-            }
-
-            return new (minX, minY, maxX - minX, maxY - minY);
-        }
-
-        public static Rectangle<T> Cover(IEnumerable<Rectangle<T>> rects)
-        {
-            var minX = T.MaxValue;
-            var minY = T.MaxValue;
-            var maxX = T.MinValue;
-            var maxY = T.MinValue;
-
-            foreach (var rect in rects)
-            {
-                minX = T.Min(minX, rect.Left);
-                minY = T.Min(minY, rect.Top);
-
-                maxX = T.Max(maxX, rect.Right);
-                maxY = T.Max(maxY, rect.Bottom);
-            }
-
-            if (minX == T.MaxValue)
-            {
-                return Empty;
-            }
-
-            return new Rectangle<T>(minX, minY, maxX - minX, maxY - minY);
-        }
+        
 
 
         public Rectangle<T> Expand(T amount)
@@ -113,8 +67,16 @@ namespace Ambacht.Common.Mathmatics
             return new Rectangle<T>(Left - amount, Top - amount, Width + (amount + amount), Height + (amount + amount));
         }
 
+        public Rectangle<T> Expand(T amountX, T amountY)
+        {
+          return new Rectangle<T>(Left - amountX, Top - amountY, Width + (amountX + amountX), Height + (amountY + amountY));
+        }
 
-        public Vector2<T> Center()
+
+        public Rectangle<T> ExpandFraction(T fraction) => Expand(fraction * Width, fraction * Height);
+
+
+    public Vector2<T> Center()
         {
             return new Vector2<T>(Left + Width / Two, Top + Height / Two);
         }

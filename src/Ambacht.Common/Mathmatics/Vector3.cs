@@ -40,7 +40,13 @@ namespace Ambacht.Common.Mathmatics
 
     public static Vector3<T> operator *(Vector3<T> v1, T v2) => new(v1.X * v2, v1.Y * v2, v1.Z * v2);
     public static Vector3<T> operator /(Vector3<T> v1, T v2) => new(v1.X / v2, v1.Y / v2, v1.Z / v2);
+    public static bool operator ==(Vector3<T> v1, Vector3<T> v2) => v1.X == v2.X && v1.Y == v2.Y && v1.Z == v2.Z;
+    public static bool operator !=(Vector3<T> v1, Vector3<T> v2) => v1.X != v2.X || v1.Y != v2.Y || v1.Z != v2.Z;
 
+
+    public static readonly Vector3<T> Zero = new Vector3<T>(T.Zero, T.Zero, T.Zero);
+
+    public static readonly Vector3<T> One = new Vector3<T>(T.One, T.One, T.One);
 
   }
 }

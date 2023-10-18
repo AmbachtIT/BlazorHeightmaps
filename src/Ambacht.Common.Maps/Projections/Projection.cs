@@ -21,16 +21,24 @@ namespace Ambacht.Common.Maps.Projections
 
 
     public static class ProjectionExtensions
-  {
+    {
 
-        public static Vector3<double> Project(this Projection projection, LatLngAltitude pos) => 
+
+    public static Vector3<double> Project(this Projection projection, LatLngAltitude pos) => 
             projection.Project(pos.ToLatLng()).ToVector3(pos.Altitude);
 
         public static LatLngAltitude Invert(this Projection projection, Vector3<double> v) =>
             projection.Invert(v.ToVector2()).WithAltitude(v.Z);
 
 
-        public static Rectangle<double> Project(this Projection projection, LatLngBounds bounds)
+      public static LatLng Invert(this Projection projection, Vector2 v) =>
+          projection.Invert(new(v.X, v.Y));
+
+      public static LatLngAltitude Invert(this Projection projection, Vector3 v) =>
+        projection.Invert(new(v.X, v.Y)).WithAltitude(v.Z);
+
+
+    public static Rectangle<double> Project(this Projection projection, LatLngBounds bounds)
         {
 	        var pos1 = projection.Project(bounds.SouthWest);
 	        var pos2 = projection.Project(bounds.NorthEast);

@@ -88,12 +88,14 @@ namespace Ambacht.Common.Maps
         }
 
 
-        public static Vector2<double> ToVector2(this Point p)
+        public static Vector2 ToVector2(this Point p)
         {
-            return new Vector2<double>(p.X, p.Y);
+            return new Vector2((float)p.X, (float)p.Y);
         }
 
-        public static Vector2<double> ToVector2(this Coordinate p)
+
+
+    public static Vector2<double> ToVector2(this Coordinate p)
         {
             return new Vector2<double>(p.X, p.Y);
         }
@@ -109,27 +111,27 @@ namespace Ambacht.Common.Maps
         }
 
 
-        public static IEnumerable<Vector2<double>> GetBoundary(this Geometry geometry)
+        public static IEnumerable<Vector2<T>> GetBoundary<T>(this Geometry geometry) where T : IFloatingPoint<T>
         {
             return geometry switch
             {
-                NetTopologySuite.Geometries.Polygon poly => GetBoundary(poly),
+                NetTopologySuite.Geometries.Polygon poly => GetBoundary<T>(poly),
                 _ => throw new InvalidOperationException()
             };
         }
 
 
-        public static IEnumerable<Vector2<double>> GetBoundary(this NetTopologySuite.Geometries.Polygon polygon)
-        {
-            return GetBoundary(polygon.ExteriorRing);
+        public static IEnumerable<Vector2<T>> GetBoundary<T>(this NetTopologySuite.Geometries.Polygon polygon) where T : IFloatingPoint<T>
+    {
+            return GetBoundary<T>(polygon.ExteriorRing);
         }
 
-        public static IEnumerable<Vector2<double>> GetBoundary(this NetTopologySuite.Geometries.LineString line)
-        {
+        public static IEnumerable<Vector2<T>> GetBoundary<T>(this NetTopologySuite.Geometries.LineString line) where T : IFloatingPoint<T>
+    {
             return
                 line
                     .Coordinates
-                    .Select(c => new Vector2<double> (c[0],  c[1]));
+                    .Select(c => new Vector2<double> (c[0],  c[1]).Cast<T>());
         }
 
 
@@ -190,23 +192,25 @@ namespace Ambacht.Common.Maps
 
 
 
-        public static Rectangle<double> GetBoundingRectangle(this Geometry geometry)
+        public static Rectangle<T> GetBoundingRectangle<T>(this Geometry geometry) where T: IFloatingPoint<T>, IMinMaxValue<T>
         {
             if (geometry == null)
             {
-                return Rectangle<double>.Empty;
+                return Rectangle<T>.Empty;
             }
 
-            return Rectangle<double>.Cover(geometry.GetBoundary());
+            return RectangleUtil.Cover(geometry.GetBoundary<T>());
         }
 
 
         public static bool Contains(this Geometry geometry, Vector2 v) => geometry.Contains(new Point(v.X, v.Y));
 
+        public static bool Contains(this Geometry geometry, Vector2<double> v) => geometry.Contains(new Point(v.X, v.Y));
 
 
-        public static string GetSvgPath(this NetTopologySuite.Geometries.Polygon polygon, WorldView<double> view)
-        {
+
+        public static string GetSvgPath<T>(this NetTopologySuite.Geometries.Polygon polygon, WorldView<T> view) where T: IFloatingPoint<T>, IMinMaxValue<T>, ITrigonometricFunctions<T>
+    {
 	        return polygon?.ExteriorRing?.GetSvgPath(view);
         }
 
@@ -240,7 +244,7 @@ namespace Ambacht.Common.Maps
 			return builder.ToString();
 		}
 
-		public static string GetSvgPath(this LineString line, WorldView<double> view)
+		public static string GetSvgPath<T>(this LineString line, WorldView<T> view) where T: IFloatingPoint<T>, IMinMaxValue<T>, ITrigonometricFunctions<T>
         {
 	        var builder = new StringBuilder();
 
@@ -283,12 +287,10 @@ namespace Ambacht.Common.Maps
 	        return builder.ToString();
         }
 
-		public static void Write(this StringBuilder builder, Coordinate coord, WorldView<double> view)
-        {
-	        var pos = view.WorldToScreen(coord.ToVector2());
-	        builder.Append(pos.X.ToString(_neutral));
-	        builder.Append(" ");
-	        builder.Append(pos.Y.ToString(_neutral));
+		public static void Write<T>(this StringBuilder builder, Coordinate coord, WorldView<T> view) where T : IFloatingPoint<T>, IMinMaxValue<T>, ITrigonometricFunctions<T>
+    {
+	        var pos = view.WorldToScreen(new Vector2<double>(coord.X, coord.Y).Cast<T>());
+          builder.Append(pos.ToString("X Y", _neutral));
         }
 
 

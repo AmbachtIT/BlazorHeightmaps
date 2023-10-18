@@ -349,7 +349,12 @@ namespace Ambacht.Common.Mathmatics
 
         public static Vector3 Translate(this Vector3 v1, float dx, float dy) => new(v1.X + dx, v1.Y + dy, v1.Z);
 
-        public static double MinimumAngleDegrees(double a1, double a2)
+        public static Vector3<T> Translate<T>(this Vector3<T> v1, Vector2<T> v2) where T: IFloatingPoint<T> => new(v1.X + v2.X, v1.Y + v2.Y, v1.Z);
+
+        public static Vector3<T> Translate<T>(this Vector3<T> v1, T dx, T dy) where T : IFloatingPoint<T> => new(v1.X + dx, v1.Y + dy, v1.Z);
+
+
+    public static double MinimumAngleDegrees(double a1, double a2)
         {
             var delta = Modulo(a1 - a2, 360.0);
             if (delta > 180)

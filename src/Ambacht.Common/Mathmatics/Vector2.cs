@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.Intrinsics;
@@ -9,7 +10,7 @@ using System.Xml;
 
 namespace Ambacht.Common.Mathmatics
 {
-  public struct Vector2<T> : IEquatable<Vector2<T>> where T: IFloatingPoint<T> 
+  public struct Vector2<T> : IEquatable<Vector2<T>>, IFormattable where T: IFloatingPoint<T> 
   {
 
     public Vector2() {}
@@ -42,9 +43,6 @@ namespace Ambacht.Common.Mathmatics
     public static bool operator !=(Vector2<T> v1, Vector2<T> v2) => v1.X != v2.X || v1.Y != v2.Y;
 
 
-    public Vector2<T2> Cast<T2>() where T2 : IFloatingPoint<T2> => new Vector2<T2>((T2)(object)X, (T2)(object)Y);
-
-
     public bool Equals(Vector2<T> other)
     {
       return EqualityComparer<T>.Default.Equals(X, other.X) && EqualityComparer<T>.Default.Equals(Y, other.Y);
@@ -60,12 +58,43 @@ namespace Ambacht.Common.Mathmatics
       return HashCode.Combine(X, Y);
     }
 
+    public string ToString(string format, IFormatProvider formatProvider)
+    {
+      if (string.IsNullOrEmpty(format))
+      {
+        return base.ToString();
+      }
+
+      var builder = new StringBuilder();
+      foreach (var c in format)
+      {
+        builder.Append(c switch
+        {
+          'x' or 'X' => X.ToString(null, formatProvider),
+          'y' or 'Y' => Y.ToString(null, formatProvider),
+          _ => c.ToString()
+        });
+      }
+      return builder.ToString();
+    }
+
+    public string ToString(string format) => ToString(format, CultureInfo.InvariantCulture);
+
     public static readonly Vector2<T> Zero = new Vector2<T>(T.Zero, T.Zero);
 
     public static readonly Vector2<T> One = new Vector2<T>(T.One, T.One);
 
 
     public static readonly T Two = T.One + T.One;
+
+
+
+    public Vector2<T2> Cast<T2>() where T2: IFloatingPoint<T2>
+    {
+      var x = T2.CreateChecked(X);
+      var y = T2.CreateChecked(Y);
+      return new Vector2<T2>(x, y);
+    }
   }
 
 

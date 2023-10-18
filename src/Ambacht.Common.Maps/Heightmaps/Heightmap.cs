@@ -358,7 +358,7 @@ namespace Ambacht.Common.Maps.Heightmaps
         {
 	        var list = heightmaps.ToList();
 
-	        var bounds = Rectangle<double>.Cover(list.Select(l => l.Bounds));
+	        var bounds = RectangleUtil.Cover(list.Select(l => l.Bounds));
 	        if (!bounds.HasArea)
 	        {
 		        throw new InvalidOperationException("Heightmaps need to have non-empty bounds for this to work");
