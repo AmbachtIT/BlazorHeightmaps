@@ -1,20 +1,31 @@
-﻿@if (_set == null)
-{
-  <span>No tile set selected</span>
-}
-else
-{
-  foreach (var tile in _visibleTiles)
+﻿<div class="map-layer">
+  @if (_set == null)
   {
-    <img class="tile"
-    @key="tile.Key"
-         src="@tile.Image"
-         style="@tile.Style" />
+    <span>No tile set selected</span>
+  }
+  else
+  {
+    foreach (var tile in _visibleTiles)
+    {
+      <img class="tile"
+           @key="tile.Key"
+           src="@tile.Image"
+           style="@tile.Style" />
+    }
+
+  }
+</div>
+
+<style>
+
+  img.tile {
+    position: absolute;
+    user-select: none;
+    pointer-events: none;
+    touch-action: none;
   }
 
-}
-
-
+</style>
 
 @code {
   private List<SlippyTileViewModel> _visibleTiles = new();

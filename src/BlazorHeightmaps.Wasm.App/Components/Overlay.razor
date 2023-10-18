@@ -1,12 +1,12 @@
-﻿<svg width="100%" height="100%">
-
+﻿<SlippyVectorLayer>
   <SlippyRectangle Value="@State.Bounds" Fill="none" StrokeWidth="2" />
   @if (State.BuildableBounds != null)
   {
     <SlippyRectangle Value="@State.BuildableBounds" Fill="none" StrokeWidth="1" />
   }
+</SlippyVectorLayer>
 
-</svg>
+
 
 
 @code {

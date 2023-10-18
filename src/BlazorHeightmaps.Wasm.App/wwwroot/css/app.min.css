@@ -576,6 +576,10 @@ video {
   position: absolute;
 }
 
+.relative {
+  position: relative;
+}
+
 .z-20 {
   z-index: 20;
 }
