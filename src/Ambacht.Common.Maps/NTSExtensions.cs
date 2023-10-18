@@ -13,7 +13,6 @@ using NetTopologySuite.Algorithm;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Utilities;
 using Point = NetTopologySuite.Geometries.Point;
-using Rectangle = Ambacht.Common.Mathmatics.Rectangle;
 
 namespace Ambacht.Common.Maps
 {
@@ -89,28 +88,28 @@ namespace Ambacht.Common.Maps
         }
 
 
-        public static Vector2 ToVector2(this Point p)
+        public static Vector2<double> ToVector2(this Point p)
         {
-            return new Vector2((float) p.X, (float) p.Y);
+            return new Vector2<double>(p.X, p.Y);
         }
 
-        public static Vector2 ToVector2(this Coordinate p)
+        public static Vector2<double> ToVector2(this Coordinate p)
         {
-            return new Vector2((float)p.X, (float)p.Y);
+            return new Vector2<double>(p.X, p.Y);
         }
 
         public static LatLng ToLatLng(this Coordinate p)
         {
-	        return new LatLng((float)p.Y, (float)p.X);
+	        return new LatLng(p.Y, p.X);
         }
 
-		public static Point ToPoint(this Vector2 v)
+		  public static Point ToPoint(this Vector2 v)
         {
             return new Point(v.X, v.Y);
         }
 
 
-        public static IEnumerable<Vector2> GetBoundary(this Geometry geometry)
+        public static IEnumerable<Vector2<double>> GetBoundary(this Geometry geometry)
         {
             return geometry switch
             {
@@ -120,17 +119,17 @@ namespace Ambacht.Common.Maps
         }
 
 
-        public static IEnumerable<Vector2> GetBoundary(this NetTopologySuite.Geometries.Polygon polygon)
+        public static IEnumerable<Vector2<double>> GetBoundary(this NetTopologySuite.Geometries.Polygon polygon)
         {
             return GetBoundary(polygon.ExteriorRing);
         }
 
-        public static IEnumerable<Vector2> GetBoundary(this NetTopologySuite.Geometries.LineString line)
+        public static IEnumerable<Vector2<double>> GetBoundary(this NetTopologySuite.Geometries.LineString line)
         {
             return
                 line
                     .Coordinates
-                    .Select(c => new Vector2((float) c[0], (float) c[1]));
+                    .Select(c => new Vector2<double> (c[0],  c[1]));
         }
 
 
@@ -186,19 +185,19 @@ namespace Ambacht.Common.Maps
 
         public static LatLng Project(this Projection projection, Coordinate coord)
         {
-            return projection.Invert(new Vector2((float)coord.X, (float)coord.Y));
+            return projection.Invert(new Vector2<double>(coord.X, coord.Y));
         }
 
 
 
-        public static Rectangle GetBoundingRectangle(this Geometry geometry)
+        public static Rectangle<double> GetBoundingRectangle(this Geometry geometry)
         {
             if (geometry == null)
             {
-                return Rectangle.Empty;
+                return Rectangle<double>.Empty;
             }
 
-            return Rectangle.Cover(geometry.GetBoundary());
+            return Rectangle<double>.Cover(geometry.GetBoundary());
         }
 
 
@@ -206,7 +205,7 @@ namespace Ambacht.Common.Maps
 
 
 
-        public static string GetSvgPath(this NetTopologySuite.Geometries.Polygon polygon, WorldView view)
+        public static string GetSvgPath(this NetTopologySuite.Geometries.Polygon polygon, WorldView<double> view)
         {
 	        return polygon?.ExteriorRing?.GetSvgPath(view);
         }
@@ -241,7 +240,7 @@ namespace Ambacht.Common.Maps
 			return builder.ToString();
 		}
 
-		public static string GetSvgPath(this LineString line, WorldView view)
+		public static string GetSvgPath(this LineString line, WorldView<double> view)
         {
 	        var builder = new StringBuilder();
 
@@ -284,7 +283,7 @@ namespace Ambacht.Common.Maps
 	        return builder.ToString();
         }
 
-		public static void Write(this StringBuilder builder, Coordinate coord, WorldView view)
+		public static void Write(this StringBuilder builder, Coordinate coord, WorldView<double> view)
         {
 	        var pos = view.WorldToScreen(coord.ToVector2());
 	        builder.Append(pos.X.ToString(_neutral));

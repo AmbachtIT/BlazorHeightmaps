@@ -208,8 +208,16 @@ namespace Ambacht.Common.Mathmatics
         );
 
 
+        /// <summary>
+        /// Reverse linear interpolation
+        /// </summary>
+        public static Vector2<T> ReverseLerp<T>(Vector2<T> from, Vector2<T> to, Vector2<T> value) where T: IFloatingPoint<T> => new(
+          ReverseLerp(from.X, to.X, value.X),
+          ReverseLerp(from.Y, to.Y, value.Y)
+        );
 
-		public static float AngleLerpDegrees(float from, float to, float alpha)
+
+    public static float AngleLerpDegrees(float from, float to, float alpha)
         {
             var delta = from - to;
             if (delta < -180)
@@ -241,6 +249,8 @@ namespace Ambacht.Common.Mathmatics
 
             return (from + (to - from) * alpha) % (float)Math.PI;
         }
+
+        public static double DegreesToRadians(double degrees) => Math.PI * degrees / 180.0;
 
         public static float DegreesToRadiansF(float degrees) => MathF.PI * degrees / 180f;
 
@@ -298,13 +308,23 @@ namespace Ambacht.Common.Mathmatics
         }
 
 
-        /// <summary>
-        /// Checks if vector v1 is on left side of vector v2
-        /// </summary>
-        /// <param name="v1"></param>
-        /// <param name="v2"></param>
-        /// <returns></returns>
-        public static bool IsOnLeftSide(this Vector2 v1, Vector2 v2)
+        public static Vector2<T> Rotate<T>(this Vector2<T> v, T angleRadians) where T: IFloatingPoint<T>, ITrigonometricFunctions<T>
+        {
+          var sin = T.Sin(angleRadians);
+          var cos = T.Cos(angleRadians);
+          var x = cos * v.X - sin * v.Y;
+          var y = sin * v.X + cos * v.Y;
+          return new Vector2<T>(x, y);
+        }
+
+
+    /// <summary>
+    /// Checks if vector v1 is on left side of vector v2
+    /// </summary>
+    /// <param name="v1"></param>
+    /// <param name="v2"></param>
+    /// <returns></returns>
+    public static bool IsOnLeftSide(this Vector2 v1, Vector2 v2)
         {
             var rotated = Rotate(v2, MathF.PI / 2f);
             var dot = Vector2.Dot(v1, rotated);

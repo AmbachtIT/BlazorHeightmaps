@@ -6,7 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Ambacht.Common.Maps;
 using Ambacht.Common.Maps.Tiles;
-using Rectangle = Ambacht.Common.Mathmatics.Rectangle;
+using Ambacht.Common.Mathmatics;
+
 
 namespace Ambacht.OpenData.Sources.Ahn
 {
@@ -22,7 +23,7 @@ namespace Ambacht.OpenData.Sources.Ahn
 		private readonly KaartbladenIndex _index = new KaartbladenIndex();
 
 
-		public IMapTile? GetTile(Vector2 coords)
+		public IMapTile? GetTile(Vector2<double> coords)
 		{
 			var sheet = _index.GetBlad(coords);
 			if (sheet == null)
@@ -33,13 +34,13 @@ namespace Ambacht.OpenData.Sources.Ahn
 			return new AhnSheetTile()
 			{
 				Key = sheet.Id,
-				Bounds = new Rectangle(sheet.X, sheet.Y, sheet.Width, sheet.Height),
+				Bounds = new Rectangle<double>(sheet.X, sheet.Y, sheet.Width, sheet.Height),
 				Crs = Crs.RdEpsg,
 				Url = _dataset.GetDownloadLink(sheet.Id)
 			};
 		}
 
-		public IEnumerable<IMapTile> GetTiles(Rectangle bounds)
+		public IEnumerable<IMapTile> GetTiles(Rectangle<double> bounds)
 		{
 			var topLeft = _index.GetBlad( bounds.TopLeft());
 			var bottomRight = _index.GetBlad( bounds.BottomRight());
@@ -48,7 +49,7 @@ namespace Ambacht.OpenData.Sources.Ahn
 			{
 				for (var x = topLeft.X; x <= bottomRight.X; x += KaartbladenIndex.BladWidthMeters)
 				{
-					var tile = GetTile(new(x, y));
+					var tile = GetTile(new (x, y));
 					if (tile != null)
 					{
 						yield return tile;
@@ -65,7 +66,7 @@ namespace Ambacht.OpenData.Sources.Ahn
 		public string Key { get; init; }
 		public string Url { get; init; }
 		public string Crs { get; init; }
-		public Rectangle Bounds { get; init; }
+		public Rectangle<double> Bounds { get; init; }
 
 
 		public override string ToString() => Key;

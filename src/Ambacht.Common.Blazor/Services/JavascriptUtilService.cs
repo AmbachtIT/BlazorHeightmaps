@@ -22,9 +22,9 @@ namespace Ambacht.Common.Blazor.Services
         public async Task ScrollToTop() => await _jsRuntime.InvokeVoidAsync("Ambacht.scrollToTop");
 
 
-        public async Task<Rectangle> GetBounds(ElementReference element)
+        public async Task<Rectangle<float>> GetBounds(ElementReference element)
         {
-            return await _jsRuntime.InvokeAsync<Rectangle>("Ambacht.getBounds", element);
+            return await _jsRuntime.InvokeAsync<Rectangle<float>>("Ambacht.getBounds", element);
         }
 
 

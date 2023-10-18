@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Ambacht.Common.Mathmatics;
-using Rectangle = Ambacht.Common.Mathmatics.Rectangle;
+
 
 namespace Ambacht.Common.Maps.Arcgis
 {
@@ -45,7 +45,7 @@ namespace Ambacht.Common.Maps.Arcgis
 		/// </summary>
 		public string PixelType { get; set; }
 
-		public Rectangle BoundingBox { get; set; }
+		public Rectangle<double> BoundingBox { get; set; }
 
 		public string BoundingBoxSR { get; set; }
 

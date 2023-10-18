@@ -20,7 +20,7 @@
     public DrawArea Area { get; set; }
 
     [CascadingParameter()] 
-    public WorldView View { get; set; }
+    public WorldView<float> View { get; set; }
 
     private float UnitsPerPixel => Area.Size.X / Area.SvgPixelSize.X;
 

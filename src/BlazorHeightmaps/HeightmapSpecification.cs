@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Ambacht.Common.Maps;
+using Ambacht.Common.Mathmatics;
 
 namespace BlazorHeightmaps
 {
@@ -24,7 +25,7 @@ namespace BlazorHeightmaps
 		/// <summary>
 		/// desired pixel size
 		/// </summary>
-		public Vector2 PixelSize { get; set; }
+		public Vector2<double> PixelSize { get; set; }
 
 	}
 }

@@ -25,7 +25,9 @@ namespace Ambacht.Common.Mathmatics
 
         public static Vector2 ToVector2(this Vector3 v) => new(v.X, v.Y);
 
-        public static Vector3 ToVector3(this Vector2 v, float z) => new(v.X, v.Y, z);
+        public static Vector2<T> ToVector2<T>(this Vector3<T> v) where T: IFloatingPoint<T> => new(v.X, v.Y);
+
+    public static Vector3<T> ToVector3<T>(this Vector2<T> v, T z) where T : IFloatingPoint<T> => new(v.X, v.Y, z);
 
     }
 }

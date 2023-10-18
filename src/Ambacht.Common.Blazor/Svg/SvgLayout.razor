@@ -32,7 +32,7 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         var bounds = await JavascriptUtil.GetBounds(_svg);
-        area.SvgPixelSize = bounds.Size;
+        area.SvgPixelSize = new Vector2(bounds.Size.X, bounds.Size.Y);
     }
 
     private DrawArea area = new DrawArea();

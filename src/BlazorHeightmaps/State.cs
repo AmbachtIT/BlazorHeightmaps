@@ -17,9 +17,9 @@ namespace BlazorHeightmaps
 
 		public LatLng Center { get; set; }
 
-		public float Zoom { get; set; }
+		public double Zoom { get; set; }
 
-    public float Angle { get; set; }
+    public double Angle { get; set; }
 
     public string Set { get; set; } = SlippyTileSet.OpenStreetMap.Name;
 

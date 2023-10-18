@@ -13,7 +13,7 @@ namespace BlazorHeightmaps
 	public interface IHeightmapDataProvider
 	{
 
-		Task<Heightmap> GetHeightmap(LatLngBounds bounds, Vector2 pixelSize);
+		Task<Heightmap> GetHeightmap(LatLngBounds bounds, Vector2<double> pixelSize);
 
 	}
 }

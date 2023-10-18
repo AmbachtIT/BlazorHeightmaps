@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ambacht.Common.Mathmatics;
-using Rectangle = Ambacht.Common.Mathmatics.Rectangle;
 
 namespace Ambacht.Common.Maps.Heightmaps
 {
@@ -34,7 +33,7 @@ namespace Ambacht.Common.Maps.Heightmaps
         /// <summary>
         /// If this is set, only tiles that overlap with the specified bounds are returned
         /// </summary>
-        public Rectangle Bounds { get; set; } = Rectangle.Empty;
+        public Rectangle<double> Bounds { get; set; } = Rectangle<double>.Empty;
 
 
         public async Task Run()
@@ -64,7 +63,7 @@ namespace Ambacht.Common.Maps.Heightmaps
             {
                 for (var tileX = 0; tileX < tilesX; tileX++)
                 {
-	                var newBounds = new Rectangle(
+	                var newBounds = new Rectangle<double>(
 	                  Source.Bounds.Left + tileX * tileWidthM,
 	                  Source.Bounds.Top + tileY * tileHeightM,
 	                  tileWidthM,

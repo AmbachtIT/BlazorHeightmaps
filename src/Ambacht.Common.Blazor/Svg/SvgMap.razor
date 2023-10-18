@@ -10,14 +10,14 @@
         base.OnInitialized();
         if (View != null)
         {
-            View.Size = Area.Size;
+            View.Size = new Vector2<float>(Area.Size.X, Area.Size.Y);
         }
     }
 
     
 
     [Parameter()]
-    public WorldView View { get; set; }
+    public WorldView<float> View { get; set; }
 
     [Parameter()]
     public RenderFragment ChildContent { get; set; }

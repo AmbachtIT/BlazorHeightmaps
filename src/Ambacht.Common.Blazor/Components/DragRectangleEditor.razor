@@ -51,10 +51,10 @@
     /// Rectangle in screen coordinates
     /// </summary>
     [Parameter()]
-    public Rectangle Value { get; set; }
+    public Rectangle<float> Value { get; set; }
 
     [Parameter()]
-    public EventCallback<Rectangle> ValueChanged { get; set; }
+  public EventCallback<Rectangle<float>> ValueChanged { get; set; }
 
     private float StrokeWidth => IsEditable ? 2 : 1;
 

@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Ambacht.Common.Maps.Projections;
+using Ambacht.Common.Mathmatics;
 
 namespace Ambacht.Common.Maps.Tiles
 {
@@ -18,8 +19,8 @@ namespace Ambacht.Common.Maps.Tiles
 				_zoomLevel = zoomLevel;
 			}
 
-			public override Vector2 Project(LatLng pos) => SlippyMath.LatLngToTile(pos, _zoomLevel);
+			public override Vector2<double> Project(LatLng pos) => SlippyMath.LatLngToTile(pos, _zoomLevel);
 
-			public override LatLng Invert(Vector2 pos) => SlippyMath.TileToLatLng(pos, _zoomLevel);
+			public override LatLng Invert(Vector2<double> pos) => SlippyMath.TileToLatLng(pos, _zoomLevel);
 	}
 }

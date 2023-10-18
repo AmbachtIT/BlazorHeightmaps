@@ -12,7 +12,7 @@ using System.Xml.Xsl;
 using Ambacht.Common.Mathmatics;
 using Ambacht.Common.UX;
 using ICSharpCode.SharpZipLib.GZip;
-using Rectangle = Ambacht.Common.Mathmatics.Rectangle;
+
 
 namespace Ambacht.Common.Maps.Heightmaps
 {
@@ -30,7 +30,7 @@ namespace Ambacht.Common.Maps.Heightmaps
 
         public string Crs { get; set; }
 
-        public Rectangle Bounds { get; set; }
+        public Rectangle<double> Bounds { get; set; }
 
         /// <summary>
         /// If strict mode is set to true, out of bounds indices will result in an OutOfRangeException, otherwise they will be silently ignored
@@ -164,7 +164,7 @@ namespace Ambacht.Common.Maps.Heightmaps
             {
                 Crs = reader.ReadString(),
             };
-            result.Bounds = new Rectangle(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            result.Bounds = new Rectangle<double>(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 
             for (var i = 0; i < result._data.Length; i++)
             {
@@ -232,7 +232,7 @@ namespace Ambacht.Common.Maps.Heightmaps
 	        }
         }
 
-        public float GetInterpolatedValue(Rectangle rect)
+        public float GetInterpolatedValue(Rectangle<double> rect)
         {
 	        var count = 0f;
 			var total = 0f;
@@ -272,17 +272,17 @@ namespace Ambacht.Common.Maps.Heightmaps
 		/// <summary>
 		/// Gets index of specified coordinates
 		/// </summary>
-		public (int, int) GetIndex(Vector2 pos)
+		public (int, int) GetIndex(Vector2<double> pos)
 		{
 			var lerped = MathUtil.ReverseLerp(Bounds.TopLeft(), Bounds.BottomRight(), pos);
 			return ((int) (lerped.X * Width), (int) (lerped.Y * Height));
 		}
 
-        public Rectangle GetPixelBounds(int x, int y)
+        public Rectangle<double> GetPixelBounds(int x, int y)
         {
 	        var pixelWidth = Bounds.Width / Width;
 			var pixelHeight = Bounds.Height / Height;
-			return new Rectangle(
+			return new Rectangle<double>(
 				Bounds.Left + x * pixelWidth,
 				Bounds.Top + y * pixelHeight,
 				pixelWidth,
@@ -358,7 +358,7 @@ namespace Ambacht.Common.Maps.Heightmaps
         {
 	        var list = heightmaps.ToList();
 
-	        var bounds = Rectangle.Cover(list.Select(l => l.Bounds));
+	        var bounds = Rectangle<double>.Cover(list.Select(l => l.Bounds));
 	        if (!bounds.HasArea)
 	        {
 		        throw new InvalidOperationException("Heightmaps need to have non-empty bounds for this to work");
@@ -394,7 +394,7 @@ namespace Ambacht.Common.Maps.Heightmaps
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <returns></returns>
-        public Heightmap GetPixelArea(Vector2 pos, int width, int height)
+        public Heightmap GetPixelArea(Vector2<double> pos, int width, int height)
         {
 	        if (!Bounds.HasArea)
 	        {
@@ -404,9 +404,9 @@ namespace Ambacht.Common.Maps.Heightmaps
 	        var result = new Heightmap(width, height)
 	        {
                 Crs = Crs,
-                Bounds = new Rectangle(pos.X, pos.Y, width * Bounds.Width / Width, height * Bounds.Height / Height)
+                Bounds = new Rectangle<double>(pos.X, pos.Y, width * Bounds.Width / Width, height * Bounds.Height / Height)
 			};
-	        var alpha = MathUtil.ReverseLerp(Bounds.TopLeft(), Bounds.BottomRight(), pos);
+	        var alpha = MathUtil.ReverseLerp<double>(Bounds.TopLeft(), Bounds.BottomRight(), pos);
 	        var sx = (int)(alpha.X * Width);
 	        var sy = (int)(alpha.Y * Height);
 	        result.CopyFrom(this, sx, sy);
@@ -414,7 +414,7 @@ namespace Ambacht.Common.Maps.Heightmaps
         }
 
 
-        public Vector2 UnitsPerPixel => new(Bounds.Width / Width, Bounds.Height / Height);
+        public Vector2<double> UnitsPerPixel => new(Bounds.Width / Width, Bounds.Height / Height);
 
 
 		/// <summary>

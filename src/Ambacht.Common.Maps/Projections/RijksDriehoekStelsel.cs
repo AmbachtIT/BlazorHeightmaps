@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Ambacht.Common.Mathmatics;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 
@@ -30,18 +31,18 @@ namespace Ambacht.Common.Maps.Projections
         private readonly ICoordinateTransformation _inverse;
 
 
-        public override Vector2 Project(LatLng pos)
+        public override Vector2<double> Project(LatLng pos)
         {
-            var coord = new double[] {pos.Longitude, pos.Latitude};
+            var coord = new [] {pos.Longitude, pos.Latitude};
             var transformed = _transformation.MathTransform.Transform(coord);
-            return new Vector2((float) transformed[0], (float) transformed[1]);
+            return new Vector2<double>(transformed[0], transformed[1]);
         }
 
-        public override LatLng Invert(Vector2 pos)
+        public override LatLng Invert(Vector2<double> pos)
         {
-            var coord = new double[] { pos.X, pos.Y };
+            var coord = new [] { pos.X, pos.Y };
             var transformed = _inverse.MathTransform.Transform(coord);
-            return new LatLng((float)transformed[1], (float)transformed[0]);
+            return new LatLng(transformed[1], transformed[0]);
         }
     }
 

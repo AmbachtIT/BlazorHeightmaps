@@ -18,18 +18,10 @@ namespace Ambacht.Common.Maps.Projections
 
         public const double MetersPerDegree = Circumference / 360;
 
-        /// <summary>
-        /// Earth radius in meters
-        /// </summary>
-        public const float RadiusF = 6_371_000;
 
-        public const float CircumferenceF = RadiusF * MathF.PI * 2f;
-
-        public const float MetersPerDegreeF = CircumferenceF / 360f;
-
-        public static float GetMetersPerDegreeF(float latitude)
+        public static double GetMetersPerDegree(double latitude)
         {
-            return MathF.Cos(latitude * MathF.PI / 180f) * MetersPerDegreeF;
+            return Math.Cos(latitude * Math.PI / 180.0) * MetersPerDegree;
         }
     }
 }

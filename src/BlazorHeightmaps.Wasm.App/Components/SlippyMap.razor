@@ -40,16 +40,16 @@
 	public EventCallback<LatLng> CenterChanged { get; set; }
 
   [Parameter()]
-  public float ZoomAmount { get; set; }
+  public double ZoomAmount { get; set; }
 
   [Parameter()]
-  public EventCallback<float> ZoomAmountChanged { get; set; }
+  public EventCallback<double> ZoomAmountChanged { get; set; }
 
   [Parameter()]
   public EventCallback<SlippyMapView> OnViewChanged { get; set; }
 
   [Parameter()]
-  public float Angle { get; set; }
+  public double Angle { get; set; }
 
   [Parameter()]
   public RenderFragment ChildContent { get; set; }
@@ -71,7 +71,7 @@
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
     var sizes = await JsRuntime.InvokeAsync<int[]>("Ambacht.getSize", _container);
-    var size = new Vector2(sizes[0], sizes[1]);
+    var size = new Vector2<double>(sizes[0], sizes[1]);
     await SetView(_view with {
       Coords = Center,
       Zoom = ZoomAmount,
@@ -108,7 +108,7 @@
 
   /// <summary>Pans the map</summary>
   /// <remarks>Delta are in component pixel space, which has the same scale as tile pixel space</remarks>
-  public async Task Pan(Vector2 delta)
+  public async Task Pan(Vector2<double> delta)
   {
       await SetView(_view.Pan(delta));
 
@@ -116,14 +116,14 @@
   }
 
     private bool _dragging = false;
-    private Vector2 _previous;
+  private Vector2<double> _previous;
 
     private void OnMouseDown(MouseEventArgs args)
     {
       if (args.Button == 0)
       {
         _dragging = true;
-      _previous = new Vector2((float)args.ClientX, (float)args.ClientY);
+      _previous = new Vector2<double>(args.ClientX, args.ClientY);
       }
     }
 
@@ -141,7 +141,7 @@
       {
         if (_dragging)
         {
-        var current = new Vector2((float)args.ClientX, (float)args.ClientY);
+        var current = new Vector2<double>(args.ClientX, args.ClientY);
           var delta = current - _previous;
           _previous = current;
           await Pan(delta);
@@ -160,7 +160,7 @@
 
     #region Scrolling
 
-    public async Task Zoom(int deltaLevels, Vector2 pos)
+  public async Task Zoom(int deltaLevels, Vector2<double> pos)
     {
         var newZoomAmount = Math.Clamp(_view.ZoomLevel + deltaLevels, 1, 21);
         var center = SlippyMath.LatLngToPixel(_view.Coords, _view.ZoomLevel, TileSize);
@@ -182,7 +182,7 @@
         _amountLeft -= args.DeltaY;
         var levels = (int)(_amountLeft / _amountPerLevel);
         _amountLeft -= levels * _amountPerLevel;
-        var current = new Vector2((float)args.ClientX, (float)args.ClientY);
+        var current = new Vector2<double>(args.ClientX, args.ClientY);
         await Zoom(levels, current);
     }
 

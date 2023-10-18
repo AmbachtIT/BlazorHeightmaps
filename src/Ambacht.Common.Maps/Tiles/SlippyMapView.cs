@@ -19,9 +19,9 @@ namespace Ambacht.Common.Maps.Tiles
         /// <summary>
         /// Size of the viewport in pixels
         /// </summary>
-        public Vector2 Size { get; set; }
+        public Vector2<double> Size { get; set; }
 
-        public Vector2 HalfSize => new(Size.X / 2, Size.Y / 2);
+        public Vector2<double> HalfSize => new(Size.X / 2, Size.Y / 2);
 
         /// <summary>
         /// Zoomlevel
@@ -31,7 +31,7 @@ namespace Ambacht.Common.Maps.Tiles
         ///
         /// The maximum zoom level depends on the tile set and usually is somewhere between 15 and 20. 
         /// </remarks>
-        public float Zoom { get; set; }
+        public double Zoom { get; set; }
 
         public int ZoomLevel => (int) Math.Ceiling(Zoom);
 
@@ -43,10 +43,10 @@ namespace Ambacht.Common.Maps.Tiles
         /// <summary>
         /// Rotation angle, in degrees
         /// </summary>
-        public float Angle { get; set; }
+        public double Angle { get; set; }
 
 
-        public SlippyMapView Pan(Vector2 delta)
+        public SlippyMapView Pan(Vector2<double> delta)
         {
             var currentCoords = LatLngToView(this.Coords);
             currentCoords -= delta;
@@ -62,11 +62,11 @@ namespace Ambacht.Common.Maps.Tiles
         /// </summary>
         /// <param name="coords"></param>
         /// <returns></returns>
-        public Vector2 LatLngToView(LatLng coords)
+        public Vector2<double> LatLngToView(LatLng coords)
         {
             var position = SlippyMath.LatLngToPixel(coords, ZoomLevel, TileSize);
             position -= SlippyMath.LatLngToPixel(this.Coords, ZoomLevel, TileSize);
-            position = MathUtil.Rotate(position, MathUtil.DegreesToRadiansF(Angle));
+            position = MathUtil.Rotate(position, MathUtil.DegreesToRadians(Angle));
             position += Size / 2;
             return position;
         }
@@ -78,10 +78,10 @@ namespace Ambacht.Common.Maps.Tiles
     /// </summary>
     /// <param name="position"></param>
     /// <returns></returns>
-    public LatLng ViewToLatLng(Vector2 position)
+    public LatLng ViewToLatLng(Vector2<double> position)
           {
             position -= Size / 2;
-            position = MathUtil.Rotate(position, MathUtil.DegreesToRadiansF(-Angle));
+            position = MathUtil.Rotate(position, MathUtil.DegreesToRadians(-Angle));
 
             position += SlippyMath.LatLngToPixel(this.Coords, ZoomLevel, TileSize);
             return SlippyMath.PixelToLatLng(position, ZoomLevel, TileSize);

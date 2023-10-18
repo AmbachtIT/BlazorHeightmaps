@@ -27,7 +27,7 @@ namespace BlazorHeightmaps
 		private readonly IHeightmapReader _reader;
 
 
-		public async Task<Heightmap> GetHeightmap(LatLngBounds bounds, Vector2 pixelSize)
+		public async Task<Heightmap> GetHeightmap(LatLngBounds bounds, Vector2<double> pixelSize)
 		{
 			var rdBounds = _rd.Project(bounds).ExpandToMatchRatio(pixelSize);
 			var url = new ArcgisExportImageUrlBuilder($"https://ahn.arcgisonline.nl/arcgis/rest/services/AHNviewer/AHN4_{Layer.ToString().ToUpper()}_{FormattedResolution}/ImageServer/exportImage")

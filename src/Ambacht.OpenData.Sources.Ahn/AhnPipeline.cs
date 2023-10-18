@@ -10,8 +10,8 @@ using Ambacht.Common.IO;
 using Ambacht.Common.Maps;
 using Ambacht.Common.Maps.Heightmaps;
 using Ambacht.Common.Maps.Tiles;
+using Ambacht.Common.Mathmatics;
 using ICSharpCode.SharpZipLib.Zip;
-using Rectangle = Ambacht.Common.Mathmatics.Rectangle;
 
 namespace Ambacht.OpenData.Sources.Ahn
 {
@@ -43,11 +43,11 @@ namespace Ambacht.OpenData.Sources.Ahn
         /// <param name="set"></param>
         /// <param name="rd"></param>
         /// <returns></returns>
-        public async Task<Heightmap> StitchTiles(AhnRasterDataset set, params Vector2[] rd)
+        public async Task<Heightmap> StitchTiles(AhnRasterDataset set, params Vector2<double>[] rd)
         {
             // Collect heightmaps for all coordinates
             var tiles = rd.Select(c => _index.GetTile(set, c)).Distinct().ToList();
-            var totalBounds = Rectangle.Cover(tiles.Select(h => h.Bounds));
+            var totalBounds = Rectangle<double>.Cover(tiles.Select(h => h.Bounds));
 
             
 
@@ -64,8 +64,8 @@ namespace Ambacht.OpenData.Sources.Ahn
             {
                 for (var x = totalBounds.Left; x < totalBounds.Right; x += tileSizeMeters)
                 {
-                    var newBounds = new Rectangle(x, y, tileSizeMeters, tileSizeMeters);
-                    var heightmap = await GetTileHeightmap(set, newBounds.Center(), SaveUnneededTiles ? Rectangle.Empty : totalBounds);
+                    var newBounds = new Rectangle<double>(x, y, tileSizeMeters, tileSizeMeters);
+                    var heightmap = await GetTileHeightmap(set, newBounds.Center(), SaveUnneededTiles ? Rectangle<double>.Empty : totalBounds);
                     var sx = (int)((heightmap.Bounds.Left - totalBounds.Left) / set.MetersPerPixel);
                     var sy = (int)((heightmap.Bounds.Top - totalBounds.Top) / set.MetersPerPixel);
 
@@ -81,7 +81,7 @@ namespace Ambacht.OpenData.Sources.Ahn
         /// </summary>
         /// <param name="sheet"></param>
         /// <returns></returns>
-        public async Task<Heightmap> GetTileHeightmap(AhnRasterDataset set, Vector2 rd, Rectangle totalBounds)
+        public async Task<Heightmap> GetTileHeightmap(AhnRasterDataset set, Vector2<double> rd, Rectangle<double> totalBounds)
         {
             var tile = _index.GetTile(set, rd);
             var result = await GetTileHeightmap(set, tile, totalBounds);
@@ -98,7 +98,7 @@ namespace Ambacht.OpenData.Sources.Ahn
         /// <param name="tileX">[0, 19]</param>
         /// <param name="tileY">[0, 24]</param>
         /// <returns></returns>
-        public async Task<Heightmap> GetTileHeightmap(AhnRasterDataset set, AhnTile tile, Rectangle totalBounds)
+        public async Task<Heightmap> GetTileHeightmap(AhnRasterDataset set, AhnTile tile, Rectangle<double> totalBounds)
         {
             var path = GetTilePath(set, tile);
             if (!await _files.Exists(path))
@@ -119,7 +119,7 @@ namespace Ambacht.OpenData.Sources.Ahn
         /// <param name="version"></param>
         /// <param name="sheet"></param>
         /// <returns></returns>
-        private async Task SplitTiles(AhnRasterDataset set, string sheet, Rectangle totalBounds)
+        private async Task SplitTiles(AhnRasterDataset set, string sheet, Rectangle<double> totalBounds)
         {
             try
             {
@@ -128,7 +128,7 @@ namespace Ambacht.OpenData.Sources.Ahn
 
                 var source = await DownloadHeightmap(set, sheet);
                 source.Crs = Crs.RdEpsg;
-                source.Bounds = new Rectangle(blad.X, blad.Y, blad.Width, blad.Height);
+                source.Bounds = new Rectangle<double>(blad.X, blad.Y, blad.Width, blad.Height);
 
                 await new HeightmapTiler(_files)
                 {
@@ -216,7 +216,7 @@ namespace Ambacht.OpenData.Sources.Ahn
         public int X { get; init; }
         public int Y { get; init; }
 
-        public Rectangle Bounds { get; init; }
+        public Rectangle<double> Bounds { get; init; }
     }
 
 }

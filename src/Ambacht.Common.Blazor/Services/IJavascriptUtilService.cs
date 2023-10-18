@@ -12,6 +12,6 @@ namespace Ambacht.Common.Blazor.Services
     {
         Task ScrollToTop();
 
-        Task<Rectangle> GetBounds(ElementReference element);
+        Task<Rectangle<float>> GetBounds(ElementReference element);
     }
 }

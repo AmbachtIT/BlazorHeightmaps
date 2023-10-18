@@ -10,9 +10,9 @@ using Ambacht.Common.Maps.Projections;
 
 namespace Ambacht.Common.Maps
 {
-    public record struct LatLng(float Latitude, float Longitude)
+    public record struct LatLng(double Latitude, double Longitude)
     {
-        public LatLngAltitude WithAltitude(float altitude) => new (Latitude, Longitude, altitude);
+        public LatLngAltitude WithAltitude(double altitude) => new (Latitude, Longitude, altitude);
 
 
         /// <summary>
@@ -32,8 +32,8 @@ namespace Ambacht.Common.Maps
         public LatLng Translate(Vector2 v)
         {
 	        return new(
-		        Latitude + v.Y / Earth.MetersPerDegreeF,
-		        Longitude + v.X / Earth.GetMetersPerDegreeF(Latitude)
+		        Latitude + v.Y / Earth.MetersPerDegree,
+		        Longitude + v.X / Earth.GetMetersPerDegree(Latitude)
 	        );
         }
 
@@ -42,7 +42,7 @@ namespace Ambacht.Common.Maps
         public static LatLng operator -(LatLng l1, LatLng l2) => new(l1.Latitude - l2.Latitude, l1.Longitude - l2.Longitude);
 	}
 
-	public record struct LatLngAltitude(float Latitude, float Longitude, float Altitude)
+	public record struct LatLngAltitude(double Latitude, double Longitude, double Altitude)
     {
         public LatLng ToLatLng() => new LatLng(Latitude, Longitude);
 
@@ -55,8 +55,8 @@ namespace Ambacht.Common.Maps
         public LatLngAltitude Translate(Vector3 v)
         {
             return new(
-                Latitude + v.Y / Earth.MetersPerDegreeF,
-                Longitude + v.X / Earth.GetMetersPerDegreeF(Latitude),
+                Latitude + v.Y / Earth.MetersPerDegree,
+                Longitude + v.X / Earth.GetMetersPerDegree(Latitude),
                 Altitude + v.Z
             );
         }

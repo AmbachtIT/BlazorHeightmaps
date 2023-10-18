@@ -8,12 +8,15 @@ using System.Threading.Tasks;
 
 namespace Ambacht.Common.Mathmatics
 {
-    public record struct Rectangle : IFormattable
+
+    public record struct Rectangle<T> : IFormattable where T : IFloatingPoint<T>, IMinMaxValue<T>
     {
 
-        public Rectangle(float left, float top, float width, float height)
+      public static readonly T Two = T.One + T.One;
+
+        public Rectangle(T left, T top, T width, T height)
         {
-            if (width < 0 || height < 0)
+            if (width < T.Zero || height < T.Zero)
             {
                 throw new ArgumentOutOfRangeException();
             }
@@ -24,131 +27,125 @@ namespace Ambacht.Common.Mathmatics
             this.Height = height;
         }
 
-        public float Left { get; init; }
-        public float Top { get; init; }
+        public T Left { get; init; }
+        public T Top { get; init; }
 
-        public float Width { get; init; }
+        public T Width { get; init; }
 
-        public float Height { get; init; }
-        public float Right => Left + Width;
-        public float Bottom => Top + Height;
-        public Vector2 Size => new Vector2(Width, Height);
-        public bool HasArea => Width > 0 && Height > 0;
+        public T Height { get; init; }
+        public T Right => Left + Width;
+        public T Bottom => Top + Height;
+        public Vector2<T> Size => new Vector2<T>(Width, Height);
+        public bool HasArea => Width > T.Zero && Height > T.Zero;
 
-        public static readonly Rectangle Empty = new Rectangle();
+        public static readonly Rectangle<T> Empty = new();
 
         /// <summary>
         /// Returns a copy of this rectangle that is reduced to fit within the specified boundaries
         /// </summary>
         /// <param name="boundaries"></param>
         /// <returns></returns>
-        public Rectangle Clamp(Rectangle boundaries)
+        public Rectangle<T> Clamp(Rectangle<T> boundaries)
         {
-            var x1 = Math.Max(Left, boundaries.Left);
-            var x2 = Math.Min(Right, boundaries.Right);
-            var width = Math.Max(x2 - x1, 0);
+            var x1 = T.Max(Left, boundaries.Left);
+            var x2 = T.Min(Right, boundaries.Right);
+            var width = T.Max(x2 - x1, T.Zero);
 
-            var y1 = Math.Max(Top, boundaries.Left);
-            var y2 = Math.Min(Bottom, boundaries.Right);
-            var height = Math.Max(y2 - y1, 0);
+            var y1 = T.Max(Top, boundaries.Left);
+            var y2 = T.Min(Bottom, boundaries.Right);
+            var height = T.Max(y2 - y1, T.Zero);
 
-            return new Rectangle(x1, y1, width, height);
+            return new Rectangle<T>(x1, y1, width, height);
         }
 
 
-        public static Rectangle Cover(IEnumerable<Vector2> points)
+        public static Rectangle<T> Cover(IEnumerable<Vector2<T>> points)
         {
-            var minX = float.MaxValue;
-            var minY = float.MaxValue;
-            var maxX = float.MinValue;
-            var maxY = float.MinValue;
+            var minX = T.MaxValue;
+            var minY = T.MaxValue;
+            var maxX = T.MinValue;
+            var maxY = T.MinValue;
 
             foreach (var point in points)
             {
-                minX = Math.Min(minX, point.X);
-                minY = Math.Min(minY, point.Y);
+                minX = T.Min(minX, point.X);
+                minY = T.Min(minY, point.Y);
 
-                maxX = Math.Max(maxX, point.X);
-                maxY = Math.Max(maxY, point.Y);
+                maxX = T.Max(maxX, point.X);
+                maxY = T.Max(maxY, point.Y);
             }
 
-            if (minX == float.MaxValue)
+            if (minX == T.MaxValue)
             {
                 return Empty;
             }
 
-            return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+            return new (minX, minY, maxX - minX, maxY - minY);
         }
 
-        public static Rectangle Cover(IEnumerable<Rectangle> rects)
+        public static Rectangle<T> Cover(IEnumerable<Rectangle<T>> rects)
         {
-            var minX = float.MaxValue;
-            var minY = float.MaxValue;
-            var maxX = float.MinValue;
-            var maxY = float.MinValue;
+            var minX = T.MaxValue;
+            var minY = T.MaxValue;
+            var maxX = T.MinValue;
+            var maxY = T.MinValue;
 
             foreach (var rect in rects)
             {
-                minX = Math.Min(minX, rect.Left);
-                minY = Math.Min(minY, rect.Top);
+                minX = T.Min(minX, rect.Left);
+                minY = T.Min(minY, rect.Top);
 
-                maxX = Math.Max(maxX, rect.Right);
-                maxY = Math.Max(maxY, rect.Bottom);
+                maxX = T.Max(maxX, rect.Right);
+                maxY = T.Max(maxY, rect.Bottom);
             }
 
-            if (minX == float.MaxValue)
+            if (minX == T.MaxValue)
             {
                 return Empty;
             }
 
-            return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+            return new Rectangle<T>(minX, minY, maxX - minX, maxY - minY);
         }
 
 
-        public Rectangle Expand(float amount)
+        public Rectangle<T> Expand(T amount)
         {
-            return new Rectangle(Left - amount, Top - amount, Width + amount * 2, Height + amount * 2);
+            return new Rectangle<T>(Left - amount, Top - amount, Width + (amount + amount), Height + (amount + amount));
         }
 
-        public Rectangle ExpandPercentage(float percentage)
+
+        public Vector2<T> Center()
         {
-            var size = Math.Max(Width, Height);
-            return Expand(percentage * size / 100f);
+            return new Vector2<T>(Left + Width / Two, Top + Height / Two);
         }
 
-
-        public Vector2 Center()
-        {
-            return new Vector2(Left + Width / 2, Top + Height / 2);
-        }
-
-        public bool Contains(Vector2 v) => v.X >= Left
+        public bool Contains(Vector2<T> v) => v.X >= Left
                                            && v.X <= Right
                                            && v.Y >= Top
                                            && v.Y <= Bottom;
 
 
-        public bool Overlaps(Rectangle r) => !DoesNotOverlap(r);
+        public bool Overlaps(Rectangle<T> r) => !DoesNotOverlap(r);
 
-        private bool DoesNotOverlap(Rectangle r) => Left > r.Right
-                                                    || Right < r.Left
-                                                    || Top > r.Bottom
-                                                    || Bottom < r.Top;
+        private bool DoesNotOverlap(Rectangle<T> r) => Left > r.Right
+                                                       || Right < r.Left
+                                                       || Top > r.Bottom
+                                                       || Bottom < r.Top;
 
 
 
-        public IEnumerable<Vector2> Corners()
+        public IEnumerable<Vector2<T>> Corners()
         {
-            yield return new Vector2(Left, Top);
-            yield return new Vector2(Right, Top);
-            yield return new Vector2(Right, Bottom);
-            yield return new Vector2(Left, Bottom);
+            yield return new Vector2<T>(Left, Top);
+            yield return new Vector2<T>(Right, Top);
+            yield return new Vector2<T>(Right, Bottom);
+            yield return new Vector2<T>(Left, Bottom);
         }
 
-        public Vector2 TopLeft() => new(Left, Top);
-        public Vector2 BottomRight() => new(Right, Bottom);
+        public Vector2<T> TopLeft() => new(Left, Top);
+        public Vector2<T> BottomRight() => new(Right, Bottom);
 
-		public Rectangle Translate(Vector2 v) => new(Left + v.X, Top + v.Y, Width, Height);
+		public Rectangle<T> Translate(Vector2<T> v) => new(Left + v.X, Top + v.Y, Width, Height);
 
         #region Dragging
 
@@ -157,9 +154,9 @@ namespace Ambacht.Common.Mathmatics
         /// </summary>
         /// <param name="amount"></param>
         /// <returns></returns>
-        public Rectangle DragLeft(float amount)
+        public Rectangle<T> DragLeft(T amount)
         {
-            amount = Math.Min(amount, Width);
+            amount = T.Min(amount, Width);
             return this with
             {
                 Left = Left + amount,
@@ -172,9 +169,9 @@ namespace Ambacht.Common.Mathmatics
         /// </summary>
         /// <param name="amount"></param>
         /// <returns></returns>
-        public Rectangle DragRight(float amount)
+        public Rectangle<T> DragRight(T amount)
         {
-            amount = Math.Max(amount, -Width);
+            amount = T.Max(amount, -Width);
             return this with
             {
                 Width = Width + amount
@@ -187,9 +184,9 @@ namespace Ambacht.Common.Mathmatics
         /// </summary>
         /// <param name="amount"></param>
         /// <returns></returns>
-        public Rectangle DragTop(float amount)
+        public Rectangle<T> DragTop(T amount)
         {
-            amount = Math.Max(amount, -Height);
+            amount = T.Max(amount, -Height);
             return this with
             {
                 Top = Top + amount,
@@ -202,9 +199,9 @@ namespace Ambacht.Common.Mathmatics
         /// </summary>
         /// <param name="amount"></param>
         /// <returns></returns>
-        public Rectangle DragBottom(float amount)
+        public Rectangle<T> DragBottom(T amount)
         {
-            amount = Math.Min(amount, Height);
+            amount = T.Min(amount, Height);
             return this with
             {
                 Height = Height - amount
@@ -246,11 +243,11 @@ namespace Ambacht.Common.Mathmatics
         /// </summary>
         /// <param name="size"></param>
         /// <returns></returns>
-		public Rectangle ExpandToMatchRatio(Vector2 size)
+		public Rectangle<T> ExpandToMatchRatio(Vector2<T> size)
         {
 	        var scaleX = Width / size.X;
             var scaleY = Height / size.Y;
-            var scale = Math.Min(scaleX, scaleY);
+            var scale = T.Min(scaleX, scaleY);
 
             var newSize = size * scale;
             return Around(Center(), newSize);
@@ -261,11 +258,11 @@ namespace Ambacht.Common.Mathmatics
         /// </summary>
         /// <param name="size"></param>
         /// <returns></returns>
-        public Rectangle ShrinkToMatchRatio(Vector2 size)
+        public Rectangle<T> ShrinkToMatchRatio(Vector2<T> size)
         {
 	        var scaleX = Width / size.X;
 	        var scaleY = Height / size.Y;
-	        var scale = Math.Max(scaleX, scaleY);
+	        var scale = T.Max(scaleX, scaleY);
 
 	        var newSize = size * scale;
 	        return Around(Center(), newSize);
@@ -273,10 +270,13 @@ namespace Ambacht.Common.Mathmatics
 
 
 
-		public static Rectangle Around(Vector2 center, Vector2 size)
+		public static Rectangle<T> Around(Vector2<T> center, Vector2<T> size)
         {
-	        var half = size / 2;
-	        return new Rectangle(center.X - half.X, center.Y - half.Y, size.X, size.Y);
+	        var half = size / Two;
+	        return new Rectangle<T>(center.X - half.X, center.Y - half.Y, size.X, size.Y);
         }
     }
+
+
+    
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ambacht.Common.Mathmatics;
-using Rectangle = Ambacht.Common.Mathmatics.Rectangle;
+
 
 namespace Ambacht.Common.Maps.Tiles
 {
@@ -16,7 +16,7 @@ namespace Ambacht.Common.Maps.Tiles
 
 		string Crs { get; }
 
-		Rectangle Bounds { get; }
+		Rectangle<double> Bounds { get; }
 
 	}
 }

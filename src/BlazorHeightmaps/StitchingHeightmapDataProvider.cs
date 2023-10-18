@@ -29,7 +29,7 @@ namespace BlazorHeightmaps
 		private readonly Projection _projection = new RijksDriehoeksProjection();
 
 
-		public async Task<Heightmap> GetHeightmap(LatLngBounds latLngBounds, Vector2 pixelSize)
+		public async Task<Heightmap> GetHeightmap(LatLngBounds latLngBounds, Vector2<double> pixelSize)
 		{
 			var bounds = _projection.Project(latLngBounds).ExpandToMatchRatio(pixelSize);
 			var result = new Heightmap((int) pixelSize.X, (int) pixelSize.Y)
@@ -59,7 +59,7 @@ namespace BlazorHeightmaps
 			return result;
 		}
 
-		private Vector2 GetLocalCoordinates(LatLng coords) => new RijksDriehoeksProjection().Project(coords);
+		private Vector2<double> GetLocalCoordinates(LatLng coords) => new RijksDriehoeksProjection().Project(coords);
 
 		private float GetUnitsPerPixel() => 0.5f;
 

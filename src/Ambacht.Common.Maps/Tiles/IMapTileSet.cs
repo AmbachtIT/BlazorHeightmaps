@@ -5,25 +5,25 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Ambacht.Common.Mathmatics;
-using Rectangle = Ambacht.Common.Mathmatics.Rectangle;
+
 
 namespace Ambacht.Common.Maps.Tiles
 {
 	public interface IMapTileSet
 	{
 
-		IMapTile GetTile(Vector2 coords);
+		IMapTile GetTile(Vector2<double> coords);
 
-		IEnumerable<IMapTile> GetTiles(Rectangle bounds);
+		IEnumerable<IMapTile> GetTiles(Rectangle<double> bounds);
 
 	}
 
 
 	public static class IMapTileSetExtensions
 	{
-		public static IEnumerable<IMapTile> GetTiles(this IMapTileSet set, IEnumerable<Vector2> points)
+		public static IEnumerable<IMapTile> GetTiles(this IMapTileSet set, IEnumerable<Vector2<double>> points)
 		{
-			var bounds = Rectangle.Cover(points.Select(p => set.GetTile(p).Bounds));
+			var bounds = Rectangle<double>.Cover(points.Select(p => set.GetTile(p).Bounds));
 			return set.GetTiles(bounds);
 		}
 	}

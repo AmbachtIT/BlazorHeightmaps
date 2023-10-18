@@ -21,8 +21,8 @@ namespace Ambacht.Common.Maps.Projections
         public bool GeometryChanged => true;
         public void Filter(CoordinateSequence seq, int i)
         {
-            var lng = (float)seq.GetX(i);
-            var lat = (float)seq.GetY(i);
+            var lng = seq.GetX(i);
+            var lat = seq.GetY(i);
             var projected = _projection.Project(new LatLng(lat, lng));
             seq.SetX(i, projected.X);
             seq.SetY(i, projected.Y);

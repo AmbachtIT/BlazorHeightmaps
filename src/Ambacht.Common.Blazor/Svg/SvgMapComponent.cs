@@ -13,7 +13,7 @@ namespace Ambacht.Common.Blazor.Svg
     {
 
         [CascadingParameter()]
-        public WorldView View { get; set; }
+        public WorldView<float> View { get; set; }
 
         protected override void OnInitialized()
         {

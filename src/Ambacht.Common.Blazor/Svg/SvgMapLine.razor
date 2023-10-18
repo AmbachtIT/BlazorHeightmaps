@@ -7,12 +7,12 @@
     [Parameter()]
     public Vector2 V1 { get; set; }
 
-    private Vector2 T1 => View.WorldToScreen(V1);
+  private Vector2<float> T1 => View.WorldToScreen(new(V1.X, V1.Y));
 
     [Parameter()]
     public Vector2 V2 { get; set; }
 
-    private Vector2 T2 => View.WorldToScreen(V2);
+    private Vector2<float> T2 => View.WorldToScreen(new(V2.X, V2.Y));
 
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object> Attributes { get; set; }

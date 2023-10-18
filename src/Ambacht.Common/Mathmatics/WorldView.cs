@@ -14,13 +14,13 @@ namespace Ambacht.Common.Mathmatics
     /// <summary>
     /// Handles translating between world and screen coordinates
     /// </summary>
-    public class WorldView : INotifyPropertyChanged
+    public class WorldView<T> : INotifyPropertyChanged where T: IFloatingPoint<T>, IMinMaxValue<T>, ITrigonometricFunctions<T>
     {
 
         /// <summary>
         /// Center, in world coordinates
         /// </summary>
-        public Vector2 Center {
+        public Vector2<T> Center {
             get => _Center;
             set
             {
@@ -31,7 +31,7 @@ namespace Ambacht.Common.Mathmatics
                 }
             }
         }
-        private Vector2 _Center;
+        private Vector2<T> _Center;
 
         /// <summary>
         /// Zoom level, in pixels per unit
@@ -39,7 +39,7 @@ namespace Ambacht.Common.Mathmatics
         /// <summary>
         /// Center, in world coordinates
         /// </summary>
-        public float Zoom
+        public T Zoom
         {
             get => _Zoom;
             set
@@ -51,13 +51,13 @@ namespace Ambacht.Common.Mathmatics
                 }
             }
         }
-        private float _Zoom;
+        private T _Zoom;
 
 
         /// <summary>
         /// Size of the viewport
         /// </summary>
-        public Vector2 Size
+        public Vector2<T> Size
         {
             get => _Size;
             set
@@ -79,12 +79,12 @@ namespace Ambacht.Common.Mathmatics
             }
         }
 
-        private Vector2 _Size;
+        private Vector2<T> _Size;
 
         /// <summary>
         /// Angle of the viewport in radians
         /// </summary>
-        public float Angle
+        public T Angle
         {
             get => _Angle;
             set
@@ -96,12 +96,12 @@ namespace Ambacht.Common.Mathmatics
                 }
             }
         }
-        private float _Angle;
+        private T _Angle;
 
         public bool FlipY { get; set; }
 
 
-        public Vector2 WorldToScreen(Vector2 position)
+        public Vector2<T> WorldToScreen(Vector2<T> position)
         {
             position -= Center;
             position *= Zoom;
@@ -113,14 +113,14 @@ namespace Ambacht.Common.Mathmatics
                     Y = -position.Y
                 };
             }
-            position += Size / 2f;
+            position += Size / Vector2<T>.Two;
             return position;
         }
 
 
-        public Vector2 ScreenToWorld(Vector2 position)
+        public Vector2<T> ScreenToWorld(Vector2<T> position)
         {
-            position -= Size / 2f;
+            position -= Size / Vector2<T>.Two;
             if (FlipY)
             {
                 position = position with
@@ -128,7 +128,7 @@ namespace Ambacht.Common.Mathmatics
                     Y = -position.Y
                 };
             }
-            position = MathUtil.Rotate(position, -Angle);
+            position = MathUtil.Rotate<T>(position, -Angle);
             position /= Zoom;
             position += Center;
             return position;
@@ -136,9 +136,9 @@ namespace Ambacht.Common.Mathmatics
 
 
 
-        public void Fit(Rectangle bounds)
+        public void Fit(Rectangle<T> bounds)
         {
-            if (Size.X <= 0 || Size.Y <= 0)
+            if (Size.X <= T.Zero || Size.Y <= T.Zero)
             {
                 _deferredFit = bounds;
                 return;
@@ -146,11 +146,11 @@ namespace Ambacht.Common.Mathmatics
             var zoomX = Size.X / bounds.Width;
             var zoomY = Size.Y / bounds.Height;
             _Center = bounds.Center(); // Directly set center so PropertyChanged will not get called twice
-            Zoom = Math.Min(zoomX, zoomY);
+            Zoom = T.Min(zoomX, zoomY);
         }
 
 
-        private Rectangle? _deferredFit;
+        private Rectangle<T>? _deferredFit;
 
         public event PropertyChangedEventHandler PropertyChanged;
 

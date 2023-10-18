@@ -31,7 +31,7 @@ namespace BlazorHeightmaps.Test
 			var spec = new HeightmapSpecification()
 			{
 				Bounds = GetUtrechtBounds(),
-				PixelSize = new Vector2(1081, 1081)
+				PixelSize = new Vector2<double>(1081, 1081)
 			};
 
 			var generator = new HeightmapGenerator();
@@ -66,7 +66,7 @@ namespace BlazorHeightmaps.Test
 		}
 
 
-		private LatLngBounds GetUtrechtBounds() => _projection.Invert(Rectangle.Around(new Vector2(135273, 453774), new(17280, 17280)));
+		private LatLngBounds GetUtrechtBounds() => _projection.Invert(Rectangle<double>.Around(new Vector2<double>(135273, 453774), new(17280, 17280)));
 
 		private readonly Projection _projection = new RijksDriehoeksProjection();
 
@@ -76,7 +76,7 @@ namespace BlazorHeightmaps.Test
 			var rd = new Vector2(135273, 453774);
 			var rdw = 17280;
 			var rdh = 17280;
-			var bounds = new Rectangle(rd.X - rdw / 2f, rd.Y - rdh / 2f, rdw, rdh);
+			var bounds = new Rectangle<double>(rd.X - rdw / 2f, rd.Y - rdh / 2f, rdw, rdh);
 
 			var url = new ArcgisExportImageUrlBuilder("https://ahn.arcgisonline.nl/arcgis/rest/services/AHNviewer/AHN4_DSM_50cm/ImageServer/exportImage")
 			{

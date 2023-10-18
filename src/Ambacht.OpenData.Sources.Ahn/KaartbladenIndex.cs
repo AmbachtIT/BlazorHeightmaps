@@ -38,7 +38,7 @@ namespace Ambacht.OpenData.Sources.Ahn
         /// </summary>
         /// <param name="rd">The position in RD coordinates</param>
         /// <returns>The AHN map sheet id, or null if the coordinate is out of bounds</returns>
-        public Kaartblad GetBlad(Vector2 rd)
+        public Kaartblad GetBlad(Vector2<double> rd)
         {
             var key = GetKey(rd.X, rd.Y);
             return _bladenByCoords.TryGet(key);
@@ -54,15 +54,15 @@ namespace Ambacht.OpenData.Sources.Ahn
             return _bladenById.TryGet(id);
         }
 
-        private (int, int) GetKey(float x, float y)
+        private (int, int) GetKey(double x, double y)
         {
             return ((int)(x / BladWidthMeters), (int)(y / BladHeightMeters));
         }
 
-        public AhnTile GetTile(AhnRasterDataset set, Vector2 rd)
+        public AhnTile GetTile(AhnRasterDataset set, Vector2<double> rd)
         {
             var sheet = GetBlad(rd);
-            var local = rd - new Vector2(sheet.X, sheet.Y);
+            var local = rd - new Vector2<double>(sheet.X, sheet.Y);
             var tileSizeMeters = TileSizePx * set.MetersPerPixel;
             local /= tileSizeMeters;
             var x = (int)local.X;

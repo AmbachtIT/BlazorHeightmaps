@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Ambacht.Common.Mathmatics;
-using Rectangle = Ambacht.Common.Mathmatics.Rectangle;
+
 
 namespace Ambacht.Common.Maps.Tiles
 {
@@ -37,7 +37,7 @@ namespace Ambacht.Common.Maps.Tiles
             {
                 X = coords.Item1,
                 Y = coords.Item2,
-                Bounds = new Rectangle(coords.Item1 * TileWidth, coords.Item2 * TileHeight, TileWidth, TileHeight)
+                Bounds = new Rectangle<double>(coords.Item1 * TileWidth, coords.Item2 * TileHeight, TileWidth, TileHeight)
             };
         }
 
@@ -51,8 +51,8 @@ namespace Ambacht.Common.Maps.Tiles
         public int X { get; init; }
         public int Y { get; init; }
 
-        public Rectangle Bounds { get; init; }
+        public Rectangle<double> Bounds { get; init; }
 
-        public Vector2 GetCoordinates(Vector2 world) => world - new Vector2(Bounds.Left, Bounds.Top);
+        public Vector2<double> GetCoordinates(Vector2<double> world) => world - new Vector2<double>(Bounds.Left, Bounds.Top);
     }
 }
